@@ -1,5 +1,6 @@
 package com.fiseq.truckcompany.payment.facade;
 
+import com.fiseq.truckcompany.utilities.KeyGenerationUtil;
 import com.iyzipay.Options;
 import com.iyzipay.model.*;
 import com.iyzipay.request.CreatePaymentRequest;
@@ -35,12 +36,14 @@ public class PaymentFacade {
         request.setLocale(Locale.TR.getValue());
 
         //TO DO make unique id for each transaction
-        request.setConversationId("123456789");
+        //bunun dısa tasınıp bizim database'imizde de saklanması lazım
+        request.setConversationId(KeyGenerationUtil.generateUniqueIdentifier());
 
         //PRICE unique olmalı kullanıcı belirlemeli
         request.setPrice(new BigDecimal("1"));
+
         //price ile aynı yapabiliriz kdv falan seysi simdilik vermicez bence
-        request.setPaidPrice(new BigDecimal("1.2"));
+        request.setPaidPrice(new BigDecimal("1"));
         request.setCurrency(Currency.TRY.name());
         request.setInstallment(1);
         request.setBasketId("B67832");
