@@ -3,7 +3,6 @@ package com.fiseq.truckcompany.utilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.dto.LoginForm;
-import com.fiseq.truckcompany.entities.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;

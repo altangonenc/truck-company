@@ -42,12 +42,12 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginForm loginForm) {
         final String username = loginForm.getUsername();
         final String password = loginForm.getPassword();
-        // Kimlik doğrulama işlemi
+        // verify username and password of user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        // JWT oluşturma ve tokeni döndürme
+        // create JWT and return it
         String token = Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
@@ -59,7 +59,7 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserInformationDto> getUserProfile(@RequestHeader("Authorization") String authorizationHeader) {
         try {
-            // Token doğrulaması yapılması gerekiyor
+            // should verify token
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
                 UserInformationDto userInformationDtoError = new UserInformationDto();
                 userInformationDtoError.setErrorMessage("Invalid authorization header");
@@ -67,14 +67,14 @@ public class UserController {
             }
 
             String token = authorizationHeader.substring(7); // "Bearer " prefixini kaldırıyoruz
-            // Token doğrulama işlemini gerçekleştirin, örnek olarak:
+            // verify token:
             if (!validateToken(token)) {
                 UserInformationDto userInformationDtoError = new UserInformationDto();
                 userInformationDtoError.setErrorMessage("Invalid token");
                 return new ResponseEntity<>(userInformationDtoError, HttpStatus.UNAUTHORIZED);
             }
 
-            // Token doğrulandı, kullanıcı profilini döndürün
+            // Token verified, return user
             String username = getUsernameFromToken(token);
             UserInformationDto userInformationDto = userService.getUserByUsername(username);
             if (userInformationDto == null) {
@@ -84,59 +84,48 @@ public class UserController {
             }
             return ResponseEntity.ok(userInformationDto);
         } catch (Exception e) {
-            // İstisna durumunda hata mesajı döndürün
             UserInformationDto userInformationDtoError = new UserInformationDto();
             userInformationDtoError.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(userInformationDtoError, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Token doğrulama işlemini gerçekleştiren metot
     private boolean validateToken(String token) {
         try {
-            // JWT'yı doğrulamak için kullanılacak anahtar (şifre)
             String secretKey = SecurityConstants.SECRET;
 
-            // Token'ı çözümle ve Claims nesnesine dönüştür
+            // resolve token and parse it to Claims
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Token'ın son kullanma tarihini al
             Date expirationDate = claims.getExpiration();
 
-            // Şu anki zamanı al
             Date now = new Date();
-
-            // Token'ın son kullanma tarihine göre kontrol et
+            // check the token's expiration
             if (expirationDate.before(now)) {
-                // Token süresi geçmiş, geçerli değil
                 return false;
             }
-
-            // Token geçerli
             return true;
         } catch (Exception e) {
-            // Token çözümleme hatası veya geçersiz token
+            // invalid token
             System.out.println(e.getMessage());
             return false;
         }
     }
 
-    // Token'dan kullanıcı adını çıkaran metot
+    // extracts the username in token
     private String getUsernameFromToken(String token) {
         try {
-            // JWT'yı çözmek için kullanılacak anahtar (şifre)
             String secretKey = SecurityConstants.SECRET;
 
-            // Token'ı çözümle ve Claims nesnesine dönüştür
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Claims nesnesinden kullanıcı adını al
+            // get username from Claims object
             String username = claims.getSubject();
 
             return username;
