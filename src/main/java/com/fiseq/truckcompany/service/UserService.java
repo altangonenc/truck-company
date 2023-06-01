@@ -20,7 +20,7 @@ import java.util.ArrayList;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {

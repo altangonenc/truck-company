@@ -1,6 +1,7 @@
 package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.constants.SecurityConstants;
+import com.fiseq.truckcompany.dto.LoginForm;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.entities.User;
@@ -38,15 +39,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
+    public ResponseEntity<String> loginUser(@RequestBody LoginForm loginForm) {
+        final String username = loginForm.getUsername();
+        final String password = loginForm.getPassword();
         // Kimlik doğrulama işlemi
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(username, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // JWT oluşturma ve tokeni döndürme
         String token = Jwts.builder()
-                .setSubject(user.getUserName())
+                .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes())
                 .compact();

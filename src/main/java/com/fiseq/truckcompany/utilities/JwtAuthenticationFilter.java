@@ -2,6 +2,7 @@ package com.fiseq.truckcompany.utilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiseq.truckcompany.constants.SecurityConstants;
+import com.fiseq.truckcompany.dto.LoginForm;
 import com.fiseq.truckcompany.entities.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -31,9 +32,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            LoginForm credentials = new ObjectMapper().readValue(request.getInputStream(), LoginForm.class);
             return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(credentials.getUserName(), credentials.getPassword(), new ArrayList<>())
+                    new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword(), new ArrayList<>())
             );
         } catch (IOException e) {
             throw new RuntimeException("Could not read request: " + e);
