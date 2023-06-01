@@ -39,7 +39,7 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity<UserRegistrationData> registerUser(User user) {
         UserRegistrationData userRegistrationData = new UserRegistrationData();
-        if (checkPropertiesOfUserNotNullOrEmpty(user)) {
+        if (checkPropertiesOfUserNullOrEmpty(user)) {
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.FIELDS_CANNOT_BE_EMPTY.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
         }
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
         return new ResponseEntity<>(userRegistrationData,HttpStatus.CREATED);
     }
 
-    private boolean checkPropertiesOfUserNotNullOrEmpty (User user) {
+    private boolean checkPropertiesOfUserNullOrEmpty (User user) {
         if (StringUtils.isEmpty(user.getUserName())) {
             return true;
         }
