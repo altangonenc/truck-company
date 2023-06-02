@@ -1,6 +1,6 @@
 package com.fiseq.truckcompany.utilities;
 
-import com.fiseq.truckcompany.utilities.KeyGenerationUtil;
+import com.fiseq.truckcompany.dto.PaymentCardData;
 import com.iyzipay.Options;
 import com.iyzipay.model.*;
 import com.iyzipay.request.CreatePaymentRequest;
@@ -25,7 +25,7 @@ public class PaymentFacade {
 
 
 
-    public Payment makePayment(){
+    public Payment makePayment(Currency currency, BigDecimal price, String basketId, PaymentCardData paymentCardData){
 
         Options options = new Options();
         options.setApiKey(API_KEY);
@@ -40,22 +40,22 @@ public class PaymentFacade {
         request.setConversationId(KeyGenerationUtil.generateUniqueIdentifier());
 
         //PRICE unique olmalı kullanıcı belirlemeli
-        request.setPrice(new BigDecimal("1"));
+        request.setPrice(price);
 
         //price ile aynı yapabiliriz kdv falan seysi simdilik vermicez bence
-        request.setPaidPrice(new BigDecimal("1"));
-        request.setCurrency(Currency.TRY.name());
+        request.setPaidPrice(price);
+        request.setCurrency(currency.name());
         request.setInstallment(1);
-        request.setBasketId("B67832");
+        request.setBasketId(basketId);
         request.setPaymentChannel(PaymentChannel.WEB.name());
         request.setPaymentGroup(PaymentGroup.PRODUCT.name());
 
         PaymentCard paymentCard = new PaymentCard();
-        paymentCard.setCardHolderName("John Doe");
-        paymentCard.setCardNumber("5528790000000008");
-        paymentCard.setExpireMonth("12");
-        paymentCard.setExpireYear("2030");
-        paymentCard.setCvc("123");
+        paymentCard.setCardHolderName(paymentCardData.getCardHolderName());
+        paymentCard.setCardNumber(paymentCardData.getCardNumber());
+        paymentCard.setExpireMonth(paymentCardData.getExpireMonth());
+        paymentCard.setExpireYear(paymentCardData.getExpireYear());
+        paymentCard.setCvc(paymentCardData.getCvc());
         paymentCard.setRegisterCard(0);
         request.setPaymentCard(paymentCard);
 
