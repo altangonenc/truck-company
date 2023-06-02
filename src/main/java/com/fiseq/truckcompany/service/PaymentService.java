@@ -1,4 +1,4 @@
-package com.fiseq.truckcompany.payment.service;
+package com.fiseq.truckcompany.service;
 
 import org.springframework.stereotype.Service;
 

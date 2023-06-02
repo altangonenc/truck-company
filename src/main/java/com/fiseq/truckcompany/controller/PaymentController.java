@@ -1,6 +1,6 @@
-package com.fiseq.truckcompany.payment.controller;
+package com.fiseq.truckcompany.controller;
 
-import com.fiseq.truckcompany.payment.service.PaymentService;
+import com.fiseq.truckcompany.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
