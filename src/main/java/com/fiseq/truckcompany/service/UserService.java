@@ -1,11 +1,13 @@
 package com.fiseq.truckcompany.service;
 
+import com.fiseq.truckcompany.constants.RecoveryQuestion;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -53,25 +55,26 @@ public class UserService implements UserDetailsService {
             userRegistrationData.setUserName(user.getUserName());
             userRegistrationData.setEmail(user.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.USERNAME_ALREADY_EXIST.getUserText());
-            return new ResponseEntity<>(userRegistrationData,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
         }
         if (isEmailAlreadyExists(user.getEmail())) {
             userRegistrationData.setUserName(user.getUserName());
             userRegistrationData.setEmail(user.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.EMAIL_ALREADY_EXISTS.getUserText());
-            return new ResponseEntity<>(userRegistrationData,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
         }
 
         user.setPassword(encodePassword(user.getPassword()));
+        user.setRecoveryAnswer(encodePassword(user.getRecoveryAnswer()));
         userRepository.save(user);
 
         userRegistrationData.setEmail(user.getEmail());
         userRegistrationData.setUserName(user.getUserName());
 
-        return new ResponseEntity<>(userRegistrationData,HttpStatus.CREATED);
+        return new ResponseEntity<>(userRegistrationData, HttpStatus.CREATED);
     }
 
-    private boolean checkPropertiesOfUserNullOrEmpty (User user) {
+    private boolean checkPropertiesOfUserNullOrEmpty(User user) {
         if (StringUtils.isEmpty(user.getUserName())) {
             return true;
         }
@@ -87,6 +90,12 @@ public class UserService implements UserDetailsService {
         if (StringUtils.isEmpty(user.getPassword())) {
             return true;
         }
+        if (user.getRecoveryQuestionId() == null || user.getRecoveryQuestionId() <= 0 || user.getRecoveryQuestionId() > 10) {
+            return true;
+        }
+        if (StringUtils.isEmpty(user.getRecoveryAnswer())) {
+            return true;
+        }
         return false;
     }
 
@@ -98,11 +107,11 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByEmail(email);
     }
 
-    private String encodePassword (String password) {
+    private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
 
-    public ResponseEntity<UserInformationDto> getUserProfile (String authorizationHeader) throws InvalidAuthException {
+    public ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader) throws InvalidAuthException {
         String username = extractTokenAndGetUsername(authorizationHeader);
 
         UserInformationDto userInformationDto = getUserByUsername(username);
@@ -112,7 +121,7 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok(userInformationDto);
     }
 
-    private String extractTokenAndGetUsername (String authorizationHeader) throws InvalidAuthException {
+    private String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
         if (!isAuthValid(authorizationHeader)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);
         }
@@ -120,7 +129,7 @@ public class UserService implements UserDetailsService {
         return getUsernameFromToken(token);
     }
 
-    private boolean isAuthValid (String authorizationHeader) {
+    private boolean isAuthValid(String authorizationHeader) {
         // should verify token
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return false;
@@ -176,7 +185,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    private UserInformationDto getUserByUsername (String username) {
+    private UserInformationDto getUserByUsername(String username) {
         User user = userRepository.findByUserName(username);
         if (user != null) {
             UserInformationDto userInformationDto = new UserInformationDto();
@@ -187,5 +196,52 @@ public class UserService implements UserDetailsService {
             return userInformationDto;
         }
         return null;
+    }
+
+    public ArrayList<String> getRecoveryQuestion(String authorizationHeader) {
+        ArrayList<String> questions = new ArrayList<>();
+        try {
+            String username = extractTokenAndGetUsername(authorizationHeader);
+            User user = userRepository.findByUserName(username);
+            questions.add(RecoveryQuestion.getRecoveryQuestionById(user.getRecoveryQuestionId()));
+            return questions;
+        } catch (InvalidAuthException e) {
+            for (RecoveryQuestion question : RecoveryQuestion.values()) {
+                questions.add(question.getQuestion());
+            }
+            return questions;
+        }
+    }
+
+    public ResponseEntity<UserInformationDto> changePassword(User user) throws ChangePasswordException {
+        checkIfInformationsOfUserNotCorrect(user);
+
+        UserInformationDto userInformationDto = new UserInformationDto();
+        userInformationDto.setSuccessMessage("Password successfully changed");
+        userInformationDto.setUserName(user.getUserName());
+        userInformationDto.setEmail(user.getEmail());
+        return new ResponseEntity<>(userInformationDto, HttpStatus.OK);
+    }
+
+    private void checkIfInformationsOfUserNotCorrect(User user) throws ChangePasswordException {
+        User createdUser = userRepository.findByUserName(user.getUserName());
+        if (createdUser == null) {
+            throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
+        }
+        if (!passwordEncoder.matches(user.getRecoveryAnswer(),createdUser.getRecoveryAnswer())){
+            throw new ChangePasswordException(HttpStatus.BAD_REQUEST, UserRegistrationErrorMessages.INVALID_RECOVERY_ANSWER);
+        }
+        if (!createdUser.getUserName().equals(user.getUserName())) {
+            throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
+        }
+        if (!createdUser.getEmail().equals(user.getEmail())) {
+            throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
+        }
+        createdUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(createdUser);
+        System.out.println("password successfully changed");
+    }
+    public boolean isPasswordMatched(String password, String username) {
+        return passwordEncoder.matches(password,userRepository.findByUserName(username).getPassword());
     }
 }

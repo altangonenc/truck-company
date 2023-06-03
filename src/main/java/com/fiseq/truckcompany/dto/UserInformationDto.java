@@ -15,4 +15,5 @@ public class UserInformationDto extends DtoBase{
     private String email;
     private String userName;
     private String errorMessage;
+    private String successMessage;
 }

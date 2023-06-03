@@ -32,6 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/users/register").permitAll() // Kayıt işlemine herkesin erişimi olmalı
+                .antMatchers("/users/recovery-question").permitAll()
+                .antMatchers("/users/change-password").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
