@@ -55,13 +55,13 @@ public class UserService implements UserDetailsService {
             userRegistrationData.setUserName(user.getUserName());
             userRegistrationData.setEmail(user.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.USERNAME_ALREADY_EXIST.getUserText());
-            return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
         if (isEmailAlreadyExists(user.getEmail())) {
             userRegistrationData.setUserName(user.getUserName());
             userRegistrationData.setEmail(user.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.EMAIL_ALREADY_EXISTS.getUserText());
-            return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
 
         user.setPassword(encodePassword(user.getPassword()));

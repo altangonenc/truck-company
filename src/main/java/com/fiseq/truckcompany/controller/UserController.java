@@ -100,8 +100,7 @@ public class UserController {
         } catch (Exception e) {
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setErrorMessage("Something went wrong while changing password.");
-            return new ResponseEntity<>(userInformationDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 }
