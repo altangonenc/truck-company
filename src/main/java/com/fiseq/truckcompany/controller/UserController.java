@@ -66,6 +66,7 @@ public class UserController {
     public ResponseEntity<UserInformationDto> getUserProfile(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             return userService.getUserProfile(authorizationHeader);
+
         } catch (InvalidAuthException e) {
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
