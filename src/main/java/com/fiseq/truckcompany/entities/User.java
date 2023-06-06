@@ -1,7 +1,6 @@
 package com.fiseq.truckcompany.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -9,6 +8,9 @@ import javax.persistence.*;
 @Table(name = "users")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -28,4 +30,5 @@ public class User {
     private Integer recoveryQuestionId;
 
     private String recoveryAnswer;
+
 }

@@ -3,9 +3,9 @@ package com.fiseq.truckcompany.controller;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
 import com.fiseq.truckcompany.dto.LoginForm;
+import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
-import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.service.UserService;
@@ -36,8 +36,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegistrationData> registerUser(@RequestBody User user) {
-        return userService.registerUser(user);
+    public ResponseEntity<UserRegistrationData> registerUser(@RequestBody UserDto userDto) {
+        return userService.registerUser(userDto);
     }
 
     @PostMapping("/login")
@@ -89,9 +89,9 @@ public class UserController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<UserInformationDto> changePassword(@RequestBody User user) {
+    public ResponseEntity<UserInformationDto> changePassword(@RequestBody UserDto userDto) {
         try {
-            return userService.changePassword(user);
+            return userService.changePassword(userDto);
 
         } catch (ChangePasswordException e) {
             UserInformationDto userInformationDto = new UserInformationDto();

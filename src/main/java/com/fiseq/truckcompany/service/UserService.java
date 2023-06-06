@@ -3,12 +3,14 @@ package com.fiseq.truckcompany.service;
 import com.fiseq.truckcompany.constants.RecoveryQuestion;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
+import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.entities.User;
-import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
+import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.repository.UserRepository;
+import com.fiseq.truckcompany.utilities.UserMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.apache.commons.lang3.StringUtils;
@@ -45,36 +47,33 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), new ArrayList<>());
     }
 
-    public ResponseEntity<UserRegistrationData> registerUser(User user) {
+    public ResponseEntity<UserRegistrationData> registerUser(UserDto userDto) {
         UserRegistrationData userRegistrationData = new UserRegistrationData();
-        if (checkPropertiesOfUserNullOrEmpty(user)) {
+        if (checkPropertiesOfUserNullOrEmpty(userDto)) {
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.FIELDS_CANNOT_BE_EMPTY.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
         }
-        if (isUsernameAlreadExists(user.getUserName())) {
-            userRegistrationData.setUserName(user.getUserName());
-            userRegistrationData.setEmail(user.getEmail());
+        if (isUsernameAlreadExists(userDto.getUserName())) {
+            userRegistrationData.setUserName(userDto.getUserName());
+            userRegistrationData.setEmail(userDto.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.USERNAME_ALREADY_EXIST.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
-        if (isEmailAlreadyExists(user.getEmail())) {
-            userRegistrationData.setUserName(user.getUserName());
-            userRegistrationData.setEmail(user.getEmail());
+        if (isEmailAlreadyExists(userDto.getEmail())) {
+            userRegistrationData.setUserName(userDto.getUserName());
+            userRegistrationData.setEmail(userDto.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.EMAIL_ALREADY_EXISTS.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
+        userRepository.save(UserMapper.userDtoToUser(userDto));
 
-        user.setPassword(encodePassword(user.getPassword()));
-        user.setRecoveryAnswer(encodePassword(user.getRecoveryAnswer()));
-        userRepository.save(user);
-
-        userRegistrationData.setEmail(user.getEmail());
-        userRegistrationData.setUserName(user.getUserName());
+        userRegistrationData.setEmail(userDto.getEmail());
+        userRegistrationData.setUserName(userDto.getUserName());
 
         return new ResponseEntity<>(userRegistrationData, HttpStatus.CREATED);
     }
 
-    private boolean checkPropertiesOfUserNullOrEmpty(User user) {
+    private boolean checkPropertiesOfUserNullOrEmpty(UserDto user) {
         if (StringUtils.isEmpty(user.getUserName())) {
             return true;
         }
@@ -213,17 +212,18 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public ResponseEntity<UserInformationDto> changePassword(User user) throws ChangePasswordException {
-        checkIfInformationsOfUserNotCorrect(user);
+    public ResponseEntity<UserInformationDto> changePassword(UserDto userDto) throws ChangePasswordException {
+        checkIfInformationsOfUserNotCorrect(userDto);
+        changeWithNewPassword(userDto);
 
         UserInformationDto userInformationDto = new UserInformationDto();
         userInformationDto.setSuccessMessage("Password successfully changed");
-        userInformationDto.setUserName(user.getUserName());
-        userInformationDto.setEmail(user.getEmail());
+        userInformationDto.setUserName(userDto.getUserName());
+        userInformationDto.setEmail(userDto.getEmail());
         return new ResponseEntity<>(userInformationDto, HttpStatus.OK);
     }
 
-    private void checkIfInformationsOfUserNotCorrect(User user) throws ChangePasswordException {
+    private void checkIfInformationsOfUserNotCorrect(UserDto user) throws ChangePasswordException {
         User createdUser = userRepository.findByUserName(user.getUserName());
         if (createdUser == null) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
@@ -237,11 +237,12 @@ public class UserService implements UserDetailsService {
         if (!createdUser.getEmail().equals(user.getEmail())) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
         }
-        createdUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(createdUser);
-        System.out.println("password successfully changed");
     }
-    public boolean isPasswordMatched(String password, String username) {
+    public boolean isPasswordMatched (String password, String username) {
         return passwordEncoder.matches(password,userRepository.findByUserName(username).getPassword());
+    }
+    public void changeWithNewPassword (UserDto user) {
+        userRepository.save(UserMapper.userDtoToUser(user));
+        System.out.println("password successfully changed");
     }
 }
