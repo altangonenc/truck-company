@@ -2,7 +2,9 @@ package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.TruckCompanyApplication;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
+import com.fiseq.truckcompany.dto.LoginForm;
 import com.fiseq.truckcompany.dto.UserDto;
+import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.repository.UserRepository;
 import com.fiseq.truckcompany.service.UserService;
@@ -91,4 +93,76 @@ public class UserControllerIT {
         UserRegistrationData registrationData = response.getBody();
         Assertions.assertEquals(UserRegistrationErrorMessages.USERNAME_ALREADY_EXIST.getUserText(), registrationData.getErrorMessage());
     }
+
+    @Test
+    public void loginUser_withAllValidCredentials_ThenReturnSuccessAndToken() {
+        UserDto user = new UserDto();
+        user.setPassword("mockPassword");
+        user.setUserName("mockUsername");
+        user.setEmail("mockuser@gmail.com");
+        user.setFirstName("mock");
+        user.setLastName("mock");
+        user.setRecoveryQuestionId(3);
+        user.setRecoveryAnswer("mockAnswer");
+        userRepository.save(UserMapper.userDtoToUser(user));
+
+        LoginForm loginForm = new LoginForm();
+        loginForm.setPassword("mockPassword");
+        loginForm.setUsername("mockUsername");
+        ResponseEntity<String> response = underTest.loginUser(loginForm);
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.OK,response.getStatusCode());
+    }
+
+    @Test
+    public void loginUser_withInvalidCredentials_ThenReturnFailure() {
+        //save user
+        UserDto user = new UserDto();
+        user.setPassword("mockPassword");
+        user.setUserName("mockUsername");
+        user.setEmail("mockuser@gmail.com");
+        user.setFirstName("mock");
+        user.setLastName("mock");
+        user.setRecoveryQuestionId(3);
+        user.setRecoveryAnswer("mockAnswer");
+        userRepository.save(UserMapper.userDtoToUser(user));
+
+        //test login
+        LoginForm loginForm = new LoginForm();
+        loginForm.setPassword("mockPasswordWrong");
+        loginForm.setUsername("mockUsername");
+        ResponseEntity<String> response = underTest.loginUser(loginForm);
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+    }
+
+    @Test
+    public void getProfile_withValidTokenOfUser_thenReturnProfile() {
+        //create a new user in database
+        UserDto user = new UserDto();
+        user.setPassword("mockPassword");
+        user.setUserName("mockUsername");
+        user.setEmail("mockuser@gmail.com");
+        user.setFirstName("mock");
+        user.setLastName("mock");
+        user.setRecoveryQuestionId(3);
+        user.setRecoveryAnswer("mockAnswer");
+        userRepository.save(UserMapper.userDtoToUser(user));
+        //get token for this user
+        LoginForm loginForm = new LoginForm();
+        loginForm.setPassword("mockPassword");
+        loginForm.setUsername("mockUsername");
+        ResponseEntity<String> tokenResponse = underTest.loginUser(loginForm);
+        String token = "Bearer " + tokenResponse.getBody();
+
+
+        //test
+        ResponseEntity<UserInformationDto> response = underTest.getUserProfile(token);
+        Assertions.assertEquals(user.getEmail(), response.getBody().getEmail());
+        Assertions.assertEquals(user.getUserName(), response.getBody().getUserName());
+        Assertions.assertEquals(user.getFirstName(), response.getBody().getFirstName());
+        Assertions.assertEquals(user.getLastName(), response.getBody().getLastName());
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
 }

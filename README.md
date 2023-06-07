@@ -66,7 +66,8 @@
 * This API has 2 modes. 
 * If you use it with a valid token of a user, you will get the chosen recovery question of user
 * If you use it without any token or with an invalid token, you will get all the questions. (For client integration) 
-*OPTION1:
+
+* OPTION1:
   curl --location 'localhost:8080/users/recovery-question' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjg2Njc0OTI1fQ.jK-JXGYtcjlk-mlasjBhFtqkXOwIghpdEwgRZ53sqPsjdaGboRPyYIzQk9RB8Yzkiss2n0jGFDlXNJN0F-ewuw'
 
