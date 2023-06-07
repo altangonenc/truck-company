@@ -9,6 +9,7 @@ import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.repository.UserRepository;
 import com.fiseq.truckcompany.service.UserService;
 import com.fiseq.truckcompany.utilities.UserMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -35,6 +36,12 @@ public class UserControllerIT {
 
     @Autowired
     private UserService userService;
+
+    @Before
+    public void setUp() {
+        // delete test database before each test
+        userRepository.deleteAll();
+    }
 
     @Test
     public void createNewUserWithAllValidField_ThenSuccessfullyCreated() {
