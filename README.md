@@ -69,5 +69,6 @@
 *OPTION1:
   curl --location 'localhost:8080/users/recovery-question' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjg2Njc0OTI1fQ.jK-JXGYtcjlk-mlasjBhFtqkXOwIghpdEwgRZ53sqPsjdaGboRPyYIzQk9RB8Yzkiss2n0jGFDlXNJN0F-ewuw'
-*OPTION2:
+
+* OPTION2:
   curl --location 'localhost:8080/users/recovery-question'
