@@ -96,7 +96,7 @@ public class UserController {
         } catch (ChangePasswordException e) {
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
-            return new ResponseEntity<>(userInformationDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(userInformationDto, e.getHttpStatus());
         } catch (Exception e) {
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setErrorMessage("Something went wrong while changing password.");

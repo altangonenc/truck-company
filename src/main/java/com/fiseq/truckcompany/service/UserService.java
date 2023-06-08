@@ -228,6 +228,9 @@ public class UserService implements UserDetailsService {
         if (createdUser == null) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
         }
+        if (createdUser.getRecoveryQuestionId() != user.getRecoveryQuestionId()) {
+            throw new ChangePasswordException(HttpStatus.BAD_REQUEST, UserRegistrationErrorMessages.INVALID_RECOVERY_QUESTION_FOR_SPECIFIED_USER);
+        }
         if (!passwordEncoder.matches(user.getRecoveryAnswer(),createdUser.getRecoveryAnswer())){
             throw new ChangePasswordException(HttpStatus.BAD_REQUEST, UserRegistrationErrorMessages.INVALID_RECOVERY_ANSWER);
         }
