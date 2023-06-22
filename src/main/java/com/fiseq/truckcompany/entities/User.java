@@ -31,4 +31,7 @@ public class User {
 
     private String recoveryAnswer;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile userProfile;
+
 }
