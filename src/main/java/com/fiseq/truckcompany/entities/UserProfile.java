@@ -14,13 +14,19 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UserProfile implements Serializable {
+
     @Id
+    private Long id;
+
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Job> jobs;
+
+    private double totalMoney;
 
 }
 

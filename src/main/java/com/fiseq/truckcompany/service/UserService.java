@@ -7,8 +7,10 @@ import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.entities.User;
+import com.fiseq.truckcompany.entities.UserProfile;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
 import com.fiseq.truckcompany.utilities.UserMapper;
 import io.jsonwebtoken.Claims;
@@ -30,11 +32,13 @@ import java.util.Date;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -65,7 +69,11 @@ public class UserService implements UserDetailsService {
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.EMAIL_ALREADY_EXISTS.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
-        userRepository.save(UserMapper.userDtoToUser(userDto));
+        User user = UserMapper.userDtoToUser(userDto);
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
+        userProfileRepository.save(userProfile);
+        userRepository.save(user);
 
         userRegistrationData.setEmail(userDto.getEmail());
         userRegistrationData.setUserName(userDto.getUserName());
