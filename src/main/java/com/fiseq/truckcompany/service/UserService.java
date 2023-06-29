@@ -128,7 +128,7 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok(userInformationDto);
     }
 
-    private String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
+    public String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
         if (!isAuthValid(authorizationHeader)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);
         }
