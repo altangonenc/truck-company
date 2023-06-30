@@ -26,6 +26,11 @@ public class GameServiceImpl implements GameService{
         return new ArrayList<>(Arrays.asList(TruckModel.values()));
     }
 
+    public TruckModel getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException {
+        checkToken(token);
+        return TruckModel.valueOf(truckModel);
+    }
+
     private void checkToken(String token) throws InvalidAuthException {
         if (!isTokenValid(token)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);

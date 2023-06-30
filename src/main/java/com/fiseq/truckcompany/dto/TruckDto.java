@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -19,4 +20,6 @@ import java.util.ArrayList;
 public class TruckDto extends DtoBase{
     private ArrayList<TruckModel> truckModels;
     private String errorMessage;
+    private TruckModel truckModel;
+    private HashMap<String,Object> truckModelAttributes;
 }

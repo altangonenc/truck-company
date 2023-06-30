@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface GameService {
     List<TruckModel> getAllTruckModels(String token) throws InvalidAuthException;
+
+    TruckModel getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException;
 }

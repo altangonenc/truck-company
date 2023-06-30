@@ -1,5 +1,6 @@
 package com.fiseq.truckcompany.service;
 
+import com.fiseq.truckcompany.constants.GameConstants;
 import com.fiseq.truckcompany.constants.RecoveryQuestion;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = UserMapper.userDtoToUser(userDto);
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
+        userProfile.setTotalMoney(GameConstants.STARTING_MONEY);
         userProfileRepository.save(userProfile);
         userRepository.save(user);
 
