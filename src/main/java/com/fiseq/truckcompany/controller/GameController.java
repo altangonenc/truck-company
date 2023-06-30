@@ -4,6 +4,7 @@ import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.service.GameService;
+import com.fiseq.truckcompany.service.GameServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

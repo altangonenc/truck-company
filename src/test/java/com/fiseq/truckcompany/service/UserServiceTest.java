@@ -26,7 +26,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @InjectMocks
     private UserMapper userMapper;

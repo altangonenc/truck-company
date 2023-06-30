@@ -1,6 +1,6 @@
 package com.fiseq.truckcompany.config;
 
-import com.fiseq.truckcompany.service.UserService;
+import com.fiseq.truckcompany.service.UserServiceImpl;
 import com.fiseq.truckcompany.utilities.JwtAuthenticationFilter;
 import com.fiseq.truckcompany.utilities.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     /*@Override
     protected void configure(HttpSecurity http) throws Exception {
