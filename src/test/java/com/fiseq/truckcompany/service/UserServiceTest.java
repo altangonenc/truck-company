@@ -4,6 +4,7 @@ import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
 import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.entities.User;
+import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
 import com.fiseq.truckcompany.utilities.UserMapper;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;

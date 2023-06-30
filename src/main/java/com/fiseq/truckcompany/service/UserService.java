@@ -6,6 +6,8 @@ import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 
@@ -21,4 +23,6 @@ public interface UserService {
     ResponseEntity<UserInformationDto> changePassword(UserDto userDto) throws ChangePasswordException;
 
     boolean isPasswordMatched (String password, String username);
+
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

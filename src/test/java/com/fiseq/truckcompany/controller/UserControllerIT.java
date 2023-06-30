@@ -8,7 +8,7 @@ import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.repository.UserRepository;
-import com.fiseq.truckcompany.service.UserServiceImpl;
+import com.fiseq.truckcompany.service.UserService;
 import com.fiseq.truckcompany.utilities.UserMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class UserControllerIT {
     private UserRepository userRepository;
 
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Before
     public void setUp() {
