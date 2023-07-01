@@ -1,5 +1,6 @@
 package com.fiseq.truckcompany.entities;
 
+import com.fiseq.truckcompany.constants.FreightTerminals;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,9 @@ public class Job {
     private UserProfile owner;
 
     private Double charge;
+
+    private FreightTerminals originationTerminal;
+
+    private FreightTerminals destinationTerminal;
 
 }
