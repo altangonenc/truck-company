@@ -28,12 +28,6 @@ public class UserProfile implements Serializable {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Job> jobs;
 
-    @ElementCollection
-    @CollectionTable(name = "user_profile_trucks", joinColumns = @JoinColumn(name = "user_id"))
-    @MapKeyColumn(name = "truck_model")
-    @Column(name = "truck_count")
-    private Map<Integer, Integer> trucks;
-
     private double totalMoney;
 
 }

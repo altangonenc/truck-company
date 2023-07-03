@@ -1,22 +1,20 @@
 package com.fiseq.truckcompany.entities;
 
-import com.fiseq.truckcompany.constants.FreightTerminals;
+import com.fiseq.truckcompany.constants.TruckModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "jobs")
+@Table(name = "trucks")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Job {
-
+public class Truck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,13 +23,5 @@ public class Job {
     @JoinColumn(name = "owner_id", referencedColumnName = "user_id")
     private UserProfile owner;
 
-    private Double charge;
-
-    private FreightTerminals originationTerminal;
-
-    private FreightTerminals destinationTerminal;
-
-    @Column(name = "completion_time")
-    private LocalDateTime completionTime;
-
+    private TruckModel truckModel;
 }
