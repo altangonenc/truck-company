@@ -1,6 +1,7 @@
 package com.fiseq.truckcompany.entities;
 
 import com.fiseq.truckcompany.constants.FreightTerminals;
+import com.fiseq.truckcompany.constants.JobStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class Job {
     @JoinColumn(name = "owner_id", referencedColumnName = "user_id")
     private UserProfile owner;
 
-    private Double charge;
+    private double charge;
 
     private FreightTerminals originationTerminal;
 
@@ -33,5 +34,7 @@ public class Job {
 
     @Column(name = "completion_time")
     private LocalDateTime completionTime;
+
+    private JobStatus jobStatus;
 
 }

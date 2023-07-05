@@ -1,6 +1,7 @@
 package com.fiseq.truckcompany.service;
 
 import com.fiseq.truckcompany.constants.FreightTerminals;
+import com.fiseq.truckcompany.constants.JobStatus;
 import com.fiseq.truckcompany.entities.Job;
 import com.fiseq.truckcompany.repository.JobRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,8 +41,9 @@ public class JobScheduler {
 
             FreightTerminals destinationTerminal = getRandomDestinationTerminal(originatingTerminal);
             newJob.setDestinationTerminal(destinationTerminal);
+            newJob.setJobStatus(JobStatus.VACANT);
 
-            double charge = getRandomCharge();
+            double charge = getRandomCharge(newJob);
             newJob.setCharge(charge);
 
             jobRepository.save(newJob);
@@ -59,9 +61,15 @@ public class JobScheduler {
         return destinationTerminal;
     }
 
-    private double getRandomCharge() {
-        double minCharge = 10.0;
-        double maxCharge = 100.0;
-        return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
+    private double getRandomCharge(Job job) {
+        if (job.getDestinationTerminal().getRegion() != job.getOriginationTerminal().getRegion()) {
+            double minCharge = 150.0;
+            double maxCharge = 200.0;
+            return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
+        } else {
+            double minCharge = 50.0;
+            double maxCharge = 100.0;
+            return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
+        }
     }
 }
