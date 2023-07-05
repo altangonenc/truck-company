@@ -62,14 +62,15 @@ public class JobScheduler {
     }
 
     private double getRandomCharge(Job job) {
+        double minCharge;
+        double maxCharge;
         if (job.getDestinationTerminal().getRegion() != job.getOriginationTerminal().getRegion()) {
-            double minCharge = 150.0;
-            double maxCharge = 200.0;
-            return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
+            minCharge = 150.0;
+            maxCharge = 200.0;
         } else {
-            double minCharge = 50.0;
-            double maxCharge = 100.0;
-            return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
+            minCharge = 50.0;
+            maxCharge = 100.0;
         }
+        return minCharge + (maxCharge - minCharge) * new Random().nextDouble();
     }
 }
