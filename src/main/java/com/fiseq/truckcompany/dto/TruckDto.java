@@ -19,7 +19,9 @@ import java.util.HashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TruckDto extends DtoBase{
     private ArrayList<TruckModel> truckModels;
-    private String errorMessage;
     private TruckModel truckModel;
     private HashMap<String,Object> truckModelAttributes;
+    private String successMessage;
+    private String errorMessage;
+    private Integer moneyLeftInAccount;
 }

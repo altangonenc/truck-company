@@ -1,5 +1,5 @@
 package com.fiseq.truckcompany.constants;
 
 public class GameConstants {
-    public static final double STARTING_MONEY = 20;
+    public static final Integer STARTING_MONEY = 20;
 }
