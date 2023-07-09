@@ -5,6 +5,7 @@ import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.CannotBuyTruckException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,7 +84,7 @@ public class GameController {
             TruckDto truckDto = new TruckDto();
             truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_NOT_FOUND.getUserText());
             return new ResponseEntity<>(truckDto, HttpStatus.NOT_FOUND);
-        } catch (CannotBuyTruckException e) {
+        } catch (NotEnoughMoneyException e) {
             TruckDto truckDto = new TruckDto();
             truckDto.setErrorMessage(e.getGameErrorMessages().getUserText());
             return new ResponseEntity<>(truckDto, e.getHttpStatus());

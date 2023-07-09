@@ -8,6 +8,7 @@ import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
 import com.fiseq.truckcompany.exception.CannotBuyTruckException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.repository.TruckRepository;
 import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
@@ -64,7 +65,8 @@ public class GameServiceImpl implements GameService{
             truckDto.setMoneyLeftInAccount(moneyLeft);
             return truckDto;
         }
-        throw new CannotBuyTruckException();
+
+        throw new NotEnoughMoneyException();
     }
 
     public boolean checkUsersMoneyAndCompareItWithPriceOfTruck(Integer truckPrice, UserProfile userProfile) {
