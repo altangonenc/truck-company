@@ -6,7 +6,6 @@ import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.entities.Truck;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
-import com.fiseq.truckcompany.exception.CannotBuyTruckException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.repository.TruckRepository;
@@ -58,6 +57,7 @@ public class GameServiceImpl implements GameService{
             Truck truck = new Truck();
             truck.setTruckModel(truckModel);
             truck.setOwner(userProfile);
+            truck.setOnTheJob(false);
             truckRepository.save(truck);
 
             TruckDto truckDto = new TruckDto();

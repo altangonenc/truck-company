@@ -3,7 +3,6 @@ package com.fiseq.truckcompany.controller;
 import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.exception.CannotBuyTruckException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.service.GameService;

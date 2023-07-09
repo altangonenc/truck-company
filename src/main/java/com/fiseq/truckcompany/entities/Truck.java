@@ -24,4 +24,6 @@ public class Truck {
     private UserProfile owner;
 
     private TruckModel truckModel;
+
+    private boolean onTheJob;
 }
