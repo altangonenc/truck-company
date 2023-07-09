@@ -2,7 +2,9 @@ package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
+import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
+import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.service.GameService;
@@ -79,6 +81,10 @@ public class GameController {
         try {
             TruckDto truckDto = gameService.buyTruck(authorizationHeader, truckName);
             return new ResponseEntity<>(truckDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
         } catch (IllegalArgumentException e) {
             TruckDto truckDto = new TruckDto();
             truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_NOT_FOUND.getUserText());
@@ -92,5 +98,27 @@ public class GameController {
             truckDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/job/{freightTerminal}")
+    public ResponseEntity<JobDto> getAllJobsInTerminal(@RequestHeader("Authorization") String authorizationHeader,
+                                                       @PathVariable("freightTerminal") String freightTerminal) {
+        try {
+            JobDto jobDto = gameService.getAllJobsInTerminal(authorizationHeader, freightTerminal);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.GIVEN_TERMINAL_COUNTRY_NAME_NOT_FOUND.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

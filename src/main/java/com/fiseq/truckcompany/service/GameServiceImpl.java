@@ -1,13 +1,16 @@
 package com.fiseq.truckcompany.service;
 
+import com.fiseq.truckcompany.constants.FreightTerminals;
 import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
+import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.entities.Truck;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
+import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
 import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
@@ -24,12 +27,14 @@ public class GameServiceImpl implements GameService{
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final TruckRepository truckRepository;
+    private final JobRepository jobRepository;
 
-    public GameServiceImpl(UserServiceImpl userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository) {
+    public GameServiceImpl(UserServiceImpl userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository, JobRepository jobRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
         this.truckRepository = truckRepository;
+        this.jobRepository = jobRepository;
     }
 
     public List<TruckModel> getAllTruckModels(String token) throws InvalidAuthException {
@@ -69,7 +74,19 @@ public class GameServiceImpl implements GameService{
         throw new NotEnoughMoneyException();
     }
 
-    public boolean checkUsersMoneyAndCompareItWithPriceOfTruck(Integer truckPrice, UserProfile userProfile) {
+    public JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException {
+        checkToken(token);
+        FreightTerminals terminal = checkTerminalNameAndReturn(terminalName);
+        JobDto jobDto = new JobDto();
+        jobDto.setAllJobsInTerminal(jobRepository.findAllByOriginationTerminal(terminal));
+        return jobDto;
+    }
+
+    private FreightTerminals checkTerminalNameAndReturn(String terminalName) throws IllegalArgumentException{
+        return FreightTerminals.valueOf(terminalName.toUpperCase());
+    }
+
+    private boolean checkUsersMoneyAndCompareItWithPriceOfTruck(Integer truckPrice, UserProfile userProfile) {
 
         if (truckPrice <= userProfile.getTotalMoney()) {
             return true;
