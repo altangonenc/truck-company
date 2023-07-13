@@ -9,7 +9,6 @@ import com.fiseq.truckcompany.dto.UserRegistrationData;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.service.UserService;
-import com.fiseq.truckcompany.service.UserServiceImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,7 +4,6 @@ import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.service.GameService;
@@ -119,6 +118,5 @@ public class GameController {
             jobDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 }
