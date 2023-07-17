@@ -6,6 +6,7 @@ import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.DifferentRegionDistanceCalculationException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.InvalidRouteForJobException;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface GameService {
 
     JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException;
 
-    JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException;
+    JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException;
 }

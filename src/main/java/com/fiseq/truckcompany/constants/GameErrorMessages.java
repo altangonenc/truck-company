@@ -8,7 +8,8 @@ public enum GameErrorMessages {
     GIVEN_TERMINAL_COUNTRY_NAME_NOT_FOUND("Given terminal name is not valid."),
     GIVEN_TERMINAL_NAMES_IN_ROUTE_NOT_VALID("Given route was wrong. Check your specified countries."),
     GIVEN_JOB_ID_OR_TRUCK_ID_INVALID("Given job id or selected truck id is not valid"),
-    SOMETHING_WRONG_DIFFERENT_REGION_DISTANCE_CALCULATOR("You have been selected 2 countries that cannot be reached by road.");
+    SOMETHING_WRONG_DIFFERENT_REGION_DISTANCE_CALCULATOR("You have been selected 2 countries that cannot be reached by road."),
+    WRONG_ROUTE_FOR_THIS_JOB("Given route is false. Please check it.");
 
     private final String name;
 

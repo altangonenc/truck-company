@@ -10,6 +10,7 @@ import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
 import com.fiseq.truckcompany.exception.DifferentRegionDistanceCalculationException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.InvalidRouteForJobException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
@@ -87,13 +88,15 @@ public class GameServiceImpl implements GameService{
         return jobDto;
     }
 
-    public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException {
+    public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
         String username = checkTokenAndReturnUsername(token);
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
         Optional<Job> optionalJob = jobRepository.findById(jobId);
         Job job = optionalJob.orElseThrow();
+
         double distance = 0;
+
         if (takeJobDto.getRoute() == null) {
             if (job.getOriginationTerminal().getRegion() != job.getDestinationTerminal().getRegion()) {
                 DifferentRegionDistanceCalculator calculator = new DifferentRegionDistanceCalculator(job.getOriginationTerminal(),job.getDestinationTerminal());
@@ -104,7 +107,12 @@ public class GameServiceImpl implements GameService{
                 distance = calculator.calculateRoute();
             }
         }
+
         if (takeJobDto.getRoute() != null) {
+            if (FreightTerminals.valueOf(takeJobDto.getRoute()[0]) != job.getOriginationTerminal()
+                    || FreightTerminals.valueOf(takeJobDto.getRoute()[takeJobDto.getRoute().length-1]) != job.getDestinationTerminal()) {
+                throw new InvalidRouteForJobException(HttpStatus.BAD_REQUEST, GameErrorMessages.WRONG_ROUTE_FOR_THIS_JOB);
+            }
             String[] route = takeJobDto.getRoute();
             for (int i=0; i < route.length-1; i++) {
                 FreightTerminals from = FreightTerminals.valueOf(route[i]);

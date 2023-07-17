@@ -6,6 +6,7 @@ import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
+import com.fiseq.truckcompany.exception.InvalidRouteForJobException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
 import com.fiseq.truckcompany.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -132,15 +133,19 @@ public class GameController {
         } catch (NoSuchElementException e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(GameErrorMessages.GIVEN_JOB_ID_OR_TRUCK_ID_INVALID.getUserText());
-            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(jobDto, HttpStatus.BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(GameErrorMessages.GIVEN_TERMINAL_NAMES_IN_ROUTE_NOT_VALID.getUserText());
-            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(jobDto, HttpStatus.BAD_REQUEST);
         } catch (InvalidAuthException e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
-            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (InvalidRouteForJobException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, e.getHttpStatus());
         } catch (Exception e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getMessage());
