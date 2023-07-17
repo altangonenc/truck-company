@@ -37,4 +37,8 @@ public class Job {
 
     private JobStatus jobStatus;
 
+    @OneToOne
+    @JoinColumn(name = "truck_on_the_job_id")
+    private Truck truckOnTheJob;
+
 }

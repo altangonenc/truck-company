@@ -1,6 +1,7 @@
 package com.fiseq.truckcompany.utilities;
 
 import com.fiseq.truckcompany.constants.FreightTerminals;
+import com.fiseq.truckcompany.exception.DifferentRegionDistanceCalculationException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,5 +34,5 @@ abstract class DistanceCalculator {
         return distance;
     }
 
-    public abstract double calculateRoute();
+    public abstract double calculateRoute() throws DifferentRegionDistanceCalculationException;
 }

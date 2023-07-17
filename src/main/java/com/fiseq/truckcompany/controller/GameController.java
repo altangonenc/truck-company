@@ -3,6 +3,7 @@ package com.fiseq.truckcompany.controller;
 import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.JobDto;
+import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -118,5 +120,32 @@ public class GameController {
             jobDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/job/{id}/take")
+    public ResponseEntity<JobDto> takeJob(@RequestHeader("Authorization") String authorizationHeader,
+                                          @PathVariable("id") Long jobId,
+                                          @RequestBody(required = false) TakeJobDto takeJobDto) {
+        try {
+            JobDto jobDto = gameService.takeJob(authorizationHeader, takeJobDto, jobId);
+            return new ResponseEntity<>(jobDto, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.GIVEN_JOB_ID_OR_TRUCK_ID_INVALID.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.GIVEN_TERMINAL_NAMES_IN_ROUTE_NOT_VALID.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }
