@@ -15,4 +15,12 @@ public class SameRegionDistanceCalculatorTest {
         Assertions.assertNotNull(distance);
         Assertions.assertEquals((int)distance, 473);
     }
+    @Test
+    public void testDistanceCalculator_whenSameCountries_thenReturnZeroDistance() {
+        SameRegionDistanceCalculator distanceCalculator = new SameRegionDistanceCalculator(FreightTerminals.FRANCE, FreightTerminals.FRANCE);
+        double distance = distanceCalculator.calculateRoute();
+        System.out.println(distance);
+        Assertions.assertNotNull(distance);
+        Assertions.assertEquals((int)distance, 0);
+    }
 }
