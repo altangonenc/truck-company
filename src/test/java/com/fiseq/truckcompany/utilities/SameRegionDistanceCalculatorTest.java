@@ -23,4 +23,13 @@ public class SameRegionDistanceCalculatorTest {
         Assertions.assertNotNull(distance);
         Assertions.assertEquals((int)distance, 0);
     }
+    @Test
+    public void testDistanceCalculator_betweenTurkeyAndIsrael_thenReturnDistance() {
+        SameRegionDistanceCalculator distanceCalculator = new SameRegionDistanceCalculator(FreightTerminals.TURKEY, FreightTerminals.ISRAEL);
+        double distance = distanceCalculator.calculateRoute();
+        System.out.println(distance);
+        Assertions.assertNotNull(distance);
+        Assertions.assertEquals((int)distance, 881);
+    }
+
 }

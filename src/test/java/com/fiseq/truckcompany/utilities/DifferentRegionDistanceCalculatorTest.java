@@ -22,5 +22,21 @@ public class DifferentRegionDistanceCalculatorTest {
         Assertions.assertNotNull(distance);
         Assertions.assertEquals((int)distance, 7664);
     }
+    @Test
+    public void testDistanceCalculator_betweenTurkeyAndMorocco_thenReturnDistance() throws DifferentRegionDistanceCalculationException {
+        DifferentRegionDistanceCalculator distanceCalculator = new DifferentRegionDistanceCalculator(FreightTerminals.TURKEY, FreightTerminals.MOROCCO);
+        double distance = distanceCalculator.calculateRoute();
+        System.out.println(distance);
+        Assertions.assertNotNull(distance);
+        Assertions.assertEquals((int)distance, 4837);
+    }
+    @Test
+    public void testDistanceCalculator_betweenMoroccoAndIsrael_thenReturnDistance() throws DifferentRegionDistanceCalculationException {
+        DifferentRegionDistanceCalculator distanceCalculator = new DifferentRegionDistanceCalculator(FreightTerminals.MOROCCO, FreightTerminals.ISRAEL);
+        double distance = distanceCalculator.calculateRoute();
+        System.out.println(distance);
+        Assertions.assertNotNull(distance);
+        Assertions.assertEquals((int)distance, 3955);
+    }
 
 }
