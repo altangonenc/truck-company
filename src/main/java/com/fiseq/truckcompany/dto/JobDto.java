@@ -20,5 +20,9 @@ import java.util.List;
 public class JobDto extends DtoBase{
     private String successMessage;
     private String errorMessage;
-    public List<Job> allJobsInTerminal;
+    private List<Job> allJobsInTerminal;
+    private double earnedMoney;
+    private RemainingTime remainingTime;
+    private double spentFuel;
+    private double jobCharge;
 }

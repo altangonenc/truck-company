@@ -27,7 +27,7 @@ public class UserProfile implements Serializable {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Job> jobs;
 
-    private Integer totalMoney;
+    private double totalMoney;
 
 }
 

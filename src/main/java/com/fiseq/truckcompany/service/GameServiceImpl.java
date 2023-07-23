@@ -2,16 +2,14 @@ package com.fiseq.truckcompany.service;
 
 import com.fiseq.truckcompany.constants.*;
 import com.fiseq.truckcompany.dto.JobDto;
+import com.fiseq.truckcompany.dto.RemainingTime;
 import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.entities.Job;
 import com.fiseq.truckcompany.entities.Truck;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
-import com.fiseq.truckcompany.exception.DifferentRegionDistanceCalculationException;
-import com.fiseq.truckcompany.exception.InvalidAuthException;
-import com.fiseq.truckcompany.exception.InvalidRouteForJobException;
-import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
+import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
 import com.fiseq.truckcompany.repository.UserProfileRepository;
@@ -21,11 +19,9 @@ import com.fiseq.truckcompany.utilities.SameRegionDistanceCalculator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService{
@@ -61,7 +57,7 @@ public class GameServiceImpl implements GameService{
         TruckModel truckModel = TruckModel.valueOf(truckName);
 
         if (checkUsersMoneyAndCompareItWithPriceOfTruck(truckModel.getPrice(), userProfile)) {
-            Integer moneyLeft = userProfile.getTotalMoney() - truckModel.getPrice();
+            double moneyLeft = userProfile.getTotalMoney() - truckModel.getPrice();
             userProfile.setTotalMoney(moneyLeft);
             userProfileRepository.save(userProfile);
 
@@ -92,9 +88,91 @@ public class GameServiceImpl implements GameService{
         String username = checkTokenAndReturnUsername(token);
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
-        Optional<Job> optionalJob = jobRepository.findById(jobId);
+        Optional<Job> optionalJob = jobRepository.findByIdAndOwnerEquals(jobId, null);
         Job job = optionalJob.orElseThrow();
 
+        double distance = calculateDistance(takeJobDto, job);
+
+        Truck truck = truckRepository.findByIdAndOnTheJob(takeJobDto.getTruckId(), false).orElseThrow();
+        double speedOfTruck = truck.getTruckModel().getSpeedPerformance();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime approximateCompletionOfJobTime = now.plusHours((long) distance / (long) speedOfTruck);
+
+        truck.setOnTheJob(true);
+        truckRepository.save(truck);
+
+        job.setCompletionTime(approximateCompletionOfJobTime);
+        job.setStartedTime(now);
+        job.setTruckOnTheJob(truck);
+        job.setOwner(userProfile);
+        job.setJobStatus(JobStatus.IN_PROGRESS);
+        jobRepository.save(job);
+
+        JobDto jobDto = new JobDto();
+        jobDto.setSuccessMessage(GameSuccessMessages.SUCCESSFULLY_TAKE_JOB.getUserText());
+        return jobDto;
+    }
+
+    public JobDto finishJob(String token, Long jobId) throws InvalidAuthException, JobIsNotFinishedException, TruckCrashedException {
+        String username = checkTokenAndReturnUsername(token);
+        User user = userRepository.findByUserName(username);
+        UserProfile userProfile = user.getUserProfile();
+        Optional<Job> optionalJob = jobRepository.findByIdAndOwnerEquals(jobId, userProfile);
+        Job job = optionalJob.orElseThrow();
+        Truck truck = job.getTruckOnTheJob();
+
+        Duration durationBetweenStartedAndFinishedTime = Duration.between(job.getCompletionTime(), job.getStartedTime());
+        long minutes = durationBetweenStartedAndFinishedTime.toMinutes();
+
+        if (job.getJobStatus() == JobStatus.VACANT) {
+            throw new JobIsNotFinishedException(GameErrorMessages.JOB_IS_IN_VACANT_STATUS);
+        }
+        if (job.getCompletionTime().isAfter(LocalDateTime.now())) {
+            RemainingTime remainingTime = new RemainingTime(job);
+            throw new JobIsNotFinishedException(remainingTime, GameErrorMessages.JOB_IS_NOT_FINISHED);
+        }
+
+        if (isTruckCrashed(minutes, job.getTruckOnTheJob())) {
+            job.setJobStatus(JobStatus.CRASH);
+            double spentFuel = minutes * job.getTruckOnTheJob().getTruckModel().getFuelConsumingPerformance();
+            userProfile.setTotalMoney(userProfile.getTotalMoney() - spentFuel);
+            jobRepository.save(job);
+            userProfileRepository.save(userProfile);
+            truck.setOnTheJob(false);
+            truckRepository.save(truck);
+            throw new TruckCrashedException();
+        }
+        double spentFuel = minutes * job.getTruckOnTheJob().getTruckModel().getFuelConsumingPerformance();
+        double earnedMoney = job.getCharge() - spentFuel;
+        userProfile.setTotalMoney(userProfile.getTotalMoney() + earnedMoney);
+        userProfileRepository.save(userProfile);
+        jobRepository.delete(job);
+
+        truck.setOnTheJob(false);
+        truckRepository.save(truck);
+
+        JobDto jobDto = new JobDto();
+        jobDto.setSuccessMessage("Job successfully finished. Job's charge : " + job.getCharge() + " , " + "fuel consumption : " + spentFuel);
+        jobDto.setJobCharge(job.getCharge());
+        jobDto.setSpentFuel(spentFuel);
+        jobDto.setEarnedMoney(earnedMoney);
+        return jobDto;
+
+    }
+
+    private boolean isTruckCrashed(long minutes, Truck truck){
+
+        double crashProbability = truck.getTruckModel().getCrashRisk() / 10.0;
+        crashProbability += minutes / 1000.0;
+
+        Random random = new Random();
+        int randInt = random.nextInt(101);
+
+        return randInt <= crashProbability;
+    }
+
+    private double calculateDistance(TakeJobDto takeJobDto, Job job) throws DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
         double distance = 0;
 
         if (takeJobDto.getRoute() == null) {
@@ -127,19 +205,7 @@ public class GameServiceImpl implements GameService{
                 }
             }
         }
-        Truck truck = truckRepository.findById(takeJobDto.getTruckId()).orElseThrow();
-        double speedOfTruck = truck.getTruckModel().getSpeedPerformance();
-        LocalDateTime approximateCompletionOfJobTime = LocalDateTime.now().plusHours((long) distance / (long) speedOfTruck);
-
-        job.setCompletionTime(approximateCompletionOfJobTime);
-        job.setTruckOnTheJob(truck);
-        job.setOwner(userProfile);
-        job.setJobStatus(JobStatus.IN_PROGRESS);
-        jobRepository.save(job);
-
-        JobDto jobDto = new JobDto();
-        jobDto.setSuccessMessage(GameSuccessMessages.SUCCESSFULLY_TAKE_JOB.getUserText());
-        return jobDto;
+        return distance;
     }
 
     private FreightTerminals checkTerminalNameAndReturn(String terminalName) throws IllegalArgumentException{

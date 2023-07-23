@@ -23,5 +23,5 @@ public class TruckDto extends DtoBase{
     private HashMap<String,Object> truckModelAttributes;
     private String successMessage;
     private String errorMessage;
-    private Integer moneyLeftInAccount;
+    private double moneyLeftInAccount;
 }

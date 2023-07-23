@@ -35,6 +35,9 @@ public class Job {
     @Column(name = "completion_time")
     private LocalDateTime completionTime;
 
+    @Column(name = "started_time")
+    private LocalDateTime startedTime;
+
     private JobStatus jobStatus;
 
     @OneToOne

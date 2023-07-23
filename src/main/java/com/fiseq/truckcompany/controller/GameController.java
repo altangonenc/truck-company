@@ -5,9 +5,7 @@ import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.exception.InvalidAuthException;
-import com.fiseq.truckcompany.exception.InvalidRouteForJobException;
-import com.fiseq.truckcompany.exception.NotEnoughMoneyException;
+import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -146,6 +144,37 @@ public class GameController {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getGameErrorMessages().getUserText());
             return new ResponseEntity<>(jobDto, e.getHttpStatus());
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @PostMapping("/job/{id}/finish")
+    public ResponseEntity finishJob(@RequestHeader("Authorization") String authorizationHeader,
+                                    @PathVariable("id") Long jobId) {
+        try {
+            JobDto jobDto = gameService.finishJob(authorizationHeader, jobId);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (JobIsNotFinishedException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            jobDto.setRemainingTime(e.getRemainingTime());
+            return new ResponseEntity<>(jobDto, e.getHttpStatus());
+        } catch (TruckCrashedException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, e.getHttpStatus());
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.GIVEN_JOB_ID_OR_TRUCK_ID_INVALID.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.BAD_REQUEST);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getMessage());
