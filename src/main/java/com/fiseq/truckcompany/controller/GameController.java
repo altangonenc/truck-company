@@ -100,7 +100,7 @@ public class GameController {
         }
     }
 
-    @GetMapping("/job/{freightTerminal}")
+    @GetMapping("/jobs/{freightTerminal}")
     public ResponseEntity<JobDto> getAllJobsInTerminal(@RequestHeader("Authorization") String authorizationHeader,
                                                        @PathVariable("freightTerminal") String freightTerminal) {
         try {
@@ -113,7 +113,27 @@ public class GameController {
         } catch (InvalidAuthException e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
-            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/jobs")
+    public ResponseEntity<JobDto> getAllJobs(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            JobDto jobDto = gameService.getAllJobs(authorizationHeader);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_VACANT_JOB.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
         } catch (Exception e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(e.getMessage());

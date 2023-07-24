@@ -21,6 +21,7 @@ public class JobDto extends DtoBase{
     private String successMessage;
     private String errorMessage;
     private List<Job> allJobsInTerminal;
+    private List<Job> allJobs;
     private double earnedMoney;
     private RemainingTime remainingTime;
     private double spentFuel;
