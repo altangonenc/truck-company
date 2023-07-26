@@ -173,7 +173,7 @@ public class GameController {
     }
 
     @PostMapping("/job/{id}/finish")
-    public ResponseEntity finishJob(@RequestHeader("Authorization") String authorizationHeader,
+    public ResponseEntity<JobDto> finishJob(@RequestHeader("Authorization") String authorizationHeader,
                                     @PathVariable("id") Long jobId) {
         try {
             JobDto jobDto = gameService.finishJob(authorizationHeader, jobId);
