@@ -16,4 +16,5 @@ public interface JobRepository extends JpaRepository <Job,Long> {
     List<Job> findAllByOriginationTerminal(FreightTerminals freightTerminal);
     Optional<Job> findByIdAndOwnerEquals(long id, UserProfile userProfile);
     Optional<List<Job>> findAllByJobStatusEquals(JobStatus jobStatus);
+    Optional<List<Job>> findAllByJobStatusEqualsAndOwnerEquals(JobStatus jobStatus, UserProfile userProfile);
 }

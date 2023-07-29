@@ -141,6 +141,26 @@ public class GameController {
         }
     }
 
+    @GetMapping("/user/jobs")
+    public ResponseEntity<JobDto> getAllJobsForUser(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            JobDto jobDto = gameService.getAllJobsForUser(authorizationHeader);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_VACANT_JOB.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/job/{id}/take")
     public ResponseEntity<JobDto> takeJob(@RequestHeader("Authorization") String authorizationHeader,
                                           @PathVariable("id") Long jobId,

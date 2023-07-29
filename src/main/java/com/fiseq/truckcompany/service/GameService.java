@@ -22,4 +22,6 @@ public interface GameService {
     JobDto finishJob(String token, Long jobId) throws InvalidAuthException, JobIsNotFinishedException, TruckCrashedException;
 
     JobDto getAllJobs(String token) throws InvalidAuthException;
+
+    JobDto getAllJobsForUser(String token) throws InvalidAuthException;
 }

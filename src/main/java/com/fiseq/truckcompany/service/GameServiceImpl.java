@@ -92,6 +92,16 @@ public class GameServiceImpl implements GameService{
         return jobDto;
     }
 
+    public JobDto getAllJobsForUser(String token) throws InvalidAuthException {
+        String username = checkTokenAndReturnUsername(token);
+        User user = userRepository.findByUserName(username);
+        UserProfile userProfile = user.getUserProfile();
+        JobDto jobDto = new JobDto();
+        List<Job> jobs = jobRepository.findAllByJobStatusEqualsAndOwnerEquals(JobStatus.VACANT, userProfile).orElseThrow();
+        jobDto.setAllJobs(jobs);
+        return jobDto;
+    }
+
     public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
         String username = checkTokenAndReturnUsername(token);
         User user = userRepository.findByUserName(username);
