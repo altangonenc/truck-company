@@ -53,7 +53,7 @@ public class GameController {
             truckAttributes.put("model",truckModel.getModel());
             truckAttributes.put("brand",truckModel.getBrand());
             truckAttributes.put("crashRisk",truckModel.getCrashRisk());
-            truckAttributes.put("id",truckModel.getTruckId());
+            truckAttributes.put("id",truckModel.getTruckModelId());
             truckAttributes.put("fuelPerformance",truckModel.getFuelConsumingPerformance());
             truckAttributes.put("speed",truckModel.getSpeedPerformance());
             truckAttributes.put("price",truckModel.getPrice());
@@ -98,6 +98,28 @@ public class GameController {
             truckDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/truck/get/all")
+    public ResponseEntity<?> getAllTrucksOfUser(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            ArrayList<TruckDto> truckDtos = (ArrayList<TruckDto>) gameService.getAllTrucksOfUser(authorizationHeader);
+            return new ResponseEntity<>(truckDtos, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (NoSuchElementException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(GameErrorMessages.USER_HAS_NO_TRUCK.getUserText());
+            return new ResponseEntity<>(truckDto, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
     }
 
     @GetMapping("/jobs/{freightTerminal}")

@@ -21,7 +21,7 @@ public enum TruckModel {
     //TO DO :::::: price degerleri ayarlanmali
     DAF_XF(0, "Daf", "XF", 0.05, 50, 10, 10),
     VOLVO_FH(1, "Volvo", "FH", 0.05, 60, 9, 11);
-    private Integer truckId;
+    private Integer truckModelId;
     private String brand;
     private String model;
     private double fuelConsumingPerformance;

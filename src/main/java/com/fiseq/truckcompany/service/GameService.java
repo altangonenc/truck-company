@@ -6,6 +6,7 @@ import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.exception.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface GameService {
@@ -24,4 +25,6 @@ public interface GameService {
     JobDto getAllJobs(String token) throws InvalidAuthException;
 
     JobDto getAllJobsForUser(String token) throws InvalidAuthException;
+
+    List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException;
 }

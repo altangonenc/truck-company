@@ -102,6 +102,33 @@ public class GameServiceImpl implements GameService{
         return jobDto;
     }
 
+    public List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException {
+        String username = checkTokenAndReturnUsername(token);
+        User user = userRepository.findByUserName(username);
+        UserProfile userProfile = user.getUserProfile();
+        ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
+        ArrayList<TruckDto> allTheTruckDtos = new ArrayList<>();
+        for (Truck truck : trucks) {
+
+            TruckDto truckDto = new TruckDto();
+            HashMap<String, Object> attributes = new HashMap<>();
+            attributes.put("model",truck.getTruckModel().getModel());
+            attributes.put("brand",truck.getTruckModel().getBrand());
+            attributes.put("crashRisk",truck.getTruckModel().getCrashRisk());
+            attributes.put("id",truck.getTruckModel().getTruckModelId());
+            attributes.put("fuelPerformance",truck.getTruckModel().getFuelConsumingPerformance());
+            attributes.put("speed",truck.getTruckModel().getSpeedPerformance());
+            attributes.put("price",truck.getTruckModel().getPrice());
+            truckDto.setTruckModelAttributes(attributes);
+            truckDto.setTruckId(truck.getId());
+            truckDto.setOnTheJob(truck.isOnTheJob());
+
+            allTheTruckDtos.add(truckDto);
+        }
+
+        return allTheTruckDtos;
+    }
+
     public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
         String username = checkTokenAndReturnUsername(token);
         User user = userRepository.findByUserName(username);
