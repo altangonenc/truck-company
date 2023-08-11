@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class JobIsNotFinishedException extends Exception{
+public class JobIsNotFinishedException extends RuntimeException{
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
     private final GameErrorMessages gameErrorMessages;
     private final RemainingTime remainingTime;

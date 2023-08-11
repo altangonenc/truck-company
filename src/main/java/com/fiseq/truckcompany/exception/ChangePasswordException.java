@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public class ChangePasswordException extends Exception{
+public class ChangePasswordException extends RuntimeException{
     private final HttpStatus httpStatus;
     private final UserRegistrationErrorMessages userRegistrationErrorMessages;
 }

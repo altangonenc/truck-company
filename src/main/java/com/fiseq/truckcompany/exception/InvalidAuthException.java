@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public class InvalidAuthException extends Exception{
+public class InvalidAuthException extends RuntimeException{
     private final HttpStatus httpStatus;
     private final UserRegistrationErrorMessages userRegistrationErrorMessages;
 }

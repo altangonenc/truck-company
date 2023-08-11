@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public class InvalidRouteForJobException extends Exception{
+public class InvalidRouteForJobException extends RuntimeException{
     private final HttpStatus httpStatus;
     private final GameErrorMessages gameErrorMessages;
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class TruckCrashedException extends Exception{
+public class TruckCrashedException extends RuntimeException{
     private final HttpStatus httpStatus = HttpStatus.OK;
     private final GameErrorMessages gameErrorMessages = GameErrorMessages.TRUCK_CRASHED;
 }
