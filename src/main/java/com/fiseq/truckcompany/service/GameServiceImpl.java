@@ -49,9 +49,10 @@ public class GameServiceImpl implements GameService{
         return TruckModel.valueOf(truckModel);
     }
 
-    public TruckDto buyTruck(String token, String truckName) throws Exception {
+    public TruckDto buyTruck(String token, String truckName, String location) {
 
         String username = checkTokenAndReturnUsername(token);
+        FreightTerminals terminal = checkTerminalNameAndReturn(location);
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
         TruckModel truckModel = TruckModel.valueOf(truckName);
@@ -65,6 +66,7 @@ public class GameServiceImpl implements GameService{
             truck.setTruckModel(truckModel);
             truck.setOwner(userProfile);
             truck.setOnTheJob(false);
+            truck.setLocation(terminal);
             truckRepository.save(truck);
 
             TruckDto truckDto = new TruckDto();
@@ -136,10 +138,10 @@ public class GameServiceImpl implements GameService{
         Optional<Job> optionalJob = jobRepository.findByIdAndOwnerEquals(jobId, null);
         Job job = optionalJob.orElseThrow();
 
-        double distance = calculateDistance(takeJobDto, job);
-
         Truck truck = truckRepository.findByIdAndOnTheJob(takeJobDto.getTruckId(), false).orElseThrow();
         double speedOfTruck = truck.getTruckModel().getSpeedPerformance();
+
+        double distance = calculateDistance(takeJobDto, job, truck);
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime approximateCompletionOfJobTime = now.plusHours((long) distance / (long) speedOfTruck);
@@ -195,6 +197,7 @@ public class GameServiceImpl implements GameService{
         jobRepository.delete(job);
 
         truck.setOnTheJob(false);
+        truck.setLocation(job.getDestinationTerminal());
         truckRepository.save(truck);
 
         JobDto jobDto = new JobDto();
@@ -217,17 +220,34 @@ public class GameServiceImpl implements GameService{
         return randInt <= crashProbability;
     }
 
-    private double calculateDistance(TakeJobDto takeJobDto, Job job) throws DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
+    private double calculateTrucksLocationToStartTerminal(Job job, Truck truck) {
         double distance = 0;
+        if (job.getOriginationTerminal() == truck.getLocation()) {
+            return 0;
+        }
+        if (job.getOriginationTerminal().getRegion() != truck.getLocation().getRegion()) {
+            DifferentRegionDistanceCalculator calculator = new DifferentRegionDistanceCalculator(job.getOriginationTerminal(),job.getDestinationTerminal());
+            distance += calculator.calculateRoute();
+        }
+        if (job.getOriginationTerminal().getRegion() == job.getDestinationTerminal().getRegion()) {
+            SameRegionDistanceCalculator calculator = new SameRegionDistanceCalculator(job.getOriginationTerminal(),job.getDestinationTerminal());
+            distance += calculator.calculateRoute();
+        }
+        truck.setLocation(job.getOriginationTerminal());
+        return distance;
+    }
+
+    private double calculateDistance(TakeJobDto takeJobDto, Job job, Truck truck) throws DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
+        double distance = calculateTrucksLocationToStartTerminal(job, truck);
 
         if (takeJobDto.getRoute() == null) {
             if (job.getOriginationTerminal().getRegion() != job.getDestinationTerminal().getRegion()) {
                 DifferentRegionDistanceCalculator calculator = new DifferentRegionDistanceCalculator(job.getOriginationTerminal(),job.getDestinationTerminal());
-                distance = calculator.calculateRoute();
+                distance += calculator.calculateRoute();
             }
             if (job.getOriginationTerminal().getRegion() == job.getDestinationTerminal().getRegion()) {
                 SameRegionDistanceCalculator calculator = new SameRegionDistanceCalculator(job.getOriginationTerminal(),job.getDestinationTerminal());
-                distance = calculator.calculateRoute();
+                distance += calculator.calculateRoute();
             }
         }
 
@@ -242,11 +262,11 @@ public class GameServiceImpl implements GameService{
                 FreightTerminals to = FreightTerminals.valueOf(route[i+1]);
                 if (from.getRegion() != to.getRegion()) {
                     DifferentRegionDistanceCalculator calculator = new DifferentRegionDistanceCalculator(from,to);
-                    distance = distance + calculator.calculateRoute();
+                    distance += distance + calculator.calculateRoute();
                 }
                 if (from.getRegion() == to.getRegion()) {
                     SameRegionDistanceCalculator calculator = new SameRegionDistanceCalculator(from,to);
-                    distance = distance + calculator.calculateRoute();
+                    distance += distance + calculator.calculateRoute();
                 }
             }
         }

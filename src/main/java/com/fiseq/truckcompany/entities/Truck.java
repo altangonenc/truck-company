@@ -1,5 +1,6 @@
 package com.fiseq.truckcompany.entities;
 
+import com.fiseq.truckcompany.constants.FreightTerminals;
 import com.fiseq.truckcompany.constants.TruckModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +27,6 @@ public class Truck {
     private TruckModel truckModel;
 
     private boolean onTheJob;
+
+    private FreightTerminals location;
 }

@@ -14,7 +14,7 @@ public interface GameService {
 
     TruckModel getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException;
 
-    TruckDto buyTruck(String token, String truckName) throws Exception;
+    TruckDto buyTruck(String token, String truckName, String location) throws Exception;
 
     JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException;
 

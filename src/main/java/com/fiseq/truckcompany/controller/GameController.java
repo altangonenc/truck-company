@@ -78,11 +78,12 @@ public class GameController {
 
     }
 
-    @PostMapping("/truck/buy/{truckName}")
+    @PostMapping("/truck/buy/{truckName}/{location}")
     public ResponseEntity<TruckDto> buyTruck(@RequestHeader("Authorization") String authorizationHeader,
-                                             @PathVariable("truckName") String truckName) {
+                                             @PathVariable("truckName") String truckName,
+                                             @PathVariable("location") String location) {
         try {
-            TruckDto truckDto = gameService.buyTruck(authorizationHeader, truckName);
+            TruckDto truckDto = gameService.buyTruck(authorizationHeader, truckName, location);
             return new ResponseEntity<>(truckDto, HttpStatus.OK);
         } catch (InvalidAuthException e) {
             TruckDto truckDto = new TruckDto();
@@ -90,7 +91,7 @@ public class GameController {
             return new ResponseEntity<>(truckDto, e.getHttpStatus());
         } catch (IllegalArgumentException e) {
             TruckDto truckDto = new TruckDto();
-            truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_NOT_FOUND.getUserText());
+            truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_OR_TERMINAL_NOT_FOUND.getUserText());
             return new ResponseEntity<>(truckDto, HttpStatus.NOT_FOUND);
         } catch (NotEnoughMoneyException e) {
             TruckDto truckDto = new TruckDto();

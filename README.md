@@ -7,16 +7,16 @@ The backend of an online game called Truck-company.
 * _Spring Data JPA_
 * _Spring Security_
 * _MariaDB_
-* _Iyzipay (for ingame sales)_
+* _Iyzipay (for ingame sales)_)(not for sure)(stripe is still an option)
 
 
 In order to be understandable, APIs are presented under 2 headings.
 1) User Management Api's 
 2) Gameplay Api's
 
+* _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
 
 
- 
 **:1::USER MANAGEMENT API'S:::**
 
 **SIGN UP API (POST):**
@@ -99,8 +99,8 @@ In order to be understandable, APIs are presented under 2 headings.
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' 
 
 **BUY TRUCK API (POST):**
-* You can buy a truck using this API. 
-* curl --location --request POST 'localhost:8080/api/v1/game/truck/buy/DAF_XF' \
+* You can buy a truck using this API. But you need to be careful where you want to buy it. In the example curl request, user prefers germany. 
+* curl --location --request POST 'localhost:8080/api/v1/game/truck/buy/DAF_XF/germany' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' 
 
 **GET ALL JOBS IN TERMINAL API (GET)**
