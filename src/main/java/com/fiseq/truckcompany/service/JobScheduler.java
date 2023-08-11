@@ -20,6 +20,9 @@ public class JobScheduler {
     //works every hour
     @Scheduled(initialDelay = 0, fixedDelay = 3600000)
     public void checkAndCreateNewJobsIfNeeded() {
+
+        jobRepository.deleteAllByJobStatusEqualsOrJobStatusEquals(JobStatus.CRASH, JobStatus.SUCCESS);
+
         for (FreightTerminals terminal : FreightTerminals.values()) {
             int currentAvailableJobCount = getCurrentJobCountForTerminal(terminal);
             int requiredJobCount = terminal.getCapacity() - currentAvailableJobCount;

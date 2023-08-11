@@ -194,7 +194,8 @@ public class GameServiceImpl implements GameService{
         double earnedMoney = job.getCharge() - spentFuel;
         userProfile.setTotalMoney(userProfile.getTotalMoney() + earnedMoney);
         userProfileRepository.save(userProfile);
-        jobRepository.delete(job);
+        job.setJobStatus(JobStatus.SUCCESS);
+        jobRepository.save(job);
 
         truck.setOnTheJob(false);
         truck.setLocation(job.getDestinationTerminal());
