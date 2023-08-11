@@ -188,7 +188,7 @@ public class GameServiceImpl implements GameService{
             truckRepository.save(truck);
             throw new TruckCrashedException();
         }
-        double spentFuel = minutes * job.getTruckOnTheJob().getTruckModel().getFuelConsumingPerformance();
+        double spentFuel = minutes * job.getTruckOnTheJob().getTruckModel().getFuelConsumingPerformance()/2.5;
         double earnedMoney = job.getCharge() - spentFuel;
         userProfile.setTotalMoney(userProfile.getTotalMoney() + earnedMoney);
         userProfileRepository.save(userProfile);

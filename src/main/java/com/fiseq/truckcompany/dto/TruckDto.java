@@ -2,6 +2,7 @@ package com.fiseq.truckcompany.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fiseq.truckcompany.constants.TruckModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TruckDto extends DtoBase{
+    @JsonView(Views.TruckModelView.class)
     private ArrayList<TruckModel> truckModels;
     private TruckModel truckModel;
     private HashMap<String,Object> truckModelAttributes;

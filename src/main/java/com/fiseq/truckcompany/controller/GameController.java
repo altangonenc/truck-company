@@ -1,10 +1,12 @@
 package com.fiseq.truckcompany.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.JobDto;
 import com.fiseq.truckcompany.dto.TakeJobDto;
 import com.fiseq.truckcompany.dto.TruckDto;
+import com.fiseq.truckcompany.dto.Views;
 import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ public class GameController {
     }
 
     @GetMapping("/trucks")
+    @JsonView(Views.TruckModelView.class)
     public ResponseEntity<TruckDto> getAllTruckModels(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             ArrayList<TruckModel> truckModels = (ArrayList<TruckModel>) gameService.getAllTruckModels(authorizationHeader);
