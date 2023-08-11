@@ -137,4 +137,9 @@ In order to be understandable, APIs are presented under 2 headings.
 * When the completion time of your job comes. You can use this API, for getting reward of job. 
 * curl --location --request POST 'localhost:8080/api/v1/game/job/191/finish' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' \
-  --data '' 
+  --data ''
+
+* **GET ALL TRUCKS OF USER API (GET)**
+* This API will return all trucks owned by the user.  
+* curl --location 'localhost:8080/api/v1/game/truck/get/all' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkyNDgwNjU3fQ.wZP-nqq8JVbiyzvYVW7R4BVqOSUtgL3hM8_IDgHfPiX6AgliliVFGREJphKLk2ByG2V6uc9Avy82jww7T0ptOQ' 
