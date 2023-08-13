@@ -67,6 +67,7 @@ public class GameServiceImpl implements GameService{
             truck.setOwner(userProfile);
             truck.setOnTheJob(false);
             truck.setLocation(terminal);
+            truck.setMaxMileageOfTruck(truckModel.getMaxMileageOfTruck());
             truckRepository.save(truck);
 
             TruckDto truckDto = new TruckDto();
@@ -99,7 +100,10 @@ public class GameServiceImpl implements GameService{
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
         JobDto jobDto = new JobDto();
-        List<Job> jobs = jobRepository.findAllByJobStatusEqualsAndOwnerEquals(JobStatus.VACANT, userProfile).orElseThrow();
+        List<Job> jobs = jobRepository.findAllByJobStatusEqualsOrJobStatusEqualsOrJobStatusEqualsAndOwnerEquals(JobStatus.IN_PROGRESS,
+                                                                                                                JobStatus.CRASH,
+                                                                                                                JobStatus.SUCCESS,
+                                                                                                                userProfile).orElseThrow();
         jobDto.setAllJobs(jobs);
         return jobDto;
     }
@@ -121,6 +125,7 @@ public class GameServiceImpl implements GameService{
             attributes.put("fuelPerformance",truck.getTruckModel().getFuelConsumingPerformance());
             attributes.put("speed",truck.getTruckModel().getSpeedPerformance());
             attributes.put("price",truck.getTruckModel().getPrice());
+            attributes.put("maxMileageOfTruck", truck.getMaxMileageOfTruck());
             truckDto.setTruckModelAttributes(attributes);
             truckDto.setTruckId(truck.getId());
             truckDto.setOnTheJob(truck.isOnTheJob());
@@ -143,10 +148,13 @@ public class GameServiceImpl implements GameService{
 
         double distance = calculateDistance(takeJobDto, job, truck);
 
+        isTruckOutdated(truck, distance);
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime approximateCompletionOfJobTime = now.plusHours((long) distance / (long) speedOfTruck);
 
         truck.setOnTheJob(true);
+        truck.setMaxMileageOfTruck(truck.getMaxMileageOfTruck() - distance);
         truckRepository.save(truck);
 
         job.setCompletionTime(approximateCompletionOfJobTime);
@@ -159,6 +167,12 @@ public class GameServiceImpl implements GameService{
         JobDto jobDto = new JobDto();
         jobDto.setSuccessMessage(GameSuccessMessages.SUCCESSFULLY_TAKE_JOB.getUserText());
         return jobDto;
+    }
+
+    private void isTruckOutdated(Truck truck, double distance) {
+        if (distance > truck.getMaxMileageOfTruck()) {
+            throw new OutdatedTruckException();
+        }
     }
 
     public JobDto finishJob(String token, Long jobId) throws InvalidAuthException, JobIsNotFinishedException, TruckCrashedException {

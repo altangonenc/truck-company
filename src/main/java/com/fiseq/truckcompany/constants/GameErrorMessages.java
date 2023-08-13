@@ -13,8 +13,10 @@ public enum GameErrorMessages {
     WRONG_ROUTE_FOR_THIS_JOB("Given route is false. Please check it."),
     JOB_IS_NOT_FINISHED("Specified job is not finished yet."),
     JOB_IS_IN_VACANT_STATUS("Job is vacant. You cannot finish a vacant job."),
-    THERE_IS_NO_VACANT_JOB("There is no vacant job available."),
+    THERE_IS_NO_JOB_FOR_USER("There is no job for user."),
+    THERE_IS_NO_VACANT_JOB("There is no vacant job."),
     TRUCK_CRASHED("Your truck crashed on road. Sorry to hear that but you cannot take any money for this job.(Don't forget to pay your gas :) )"),
+    TRUCK_OUTDATED("Specified truck cannot do this job. Truck is outdated. "),
     USER_HAS_NO_TRUCK("Specified User doesn't have any truck.");
     private final String name;
 

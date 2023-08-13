@@ -60,6 +60,7 @@ public class GameController {
             truckAttributes.put("fuelPerformance",truckModel.getFuelConsumingPerformance());
             truckAttributes.put("speed",truckModel.getSpeedPerformance());
             truckAttributes.put("price",truckModel.getPrice());
+            truckAttributes.put("maxMileageOfTruck", truckModel.getMaxMileageOfTruck());
             truckDto.setTruckModelAttributes(truckAttributes);
             return new ResponseEntity<>(truckDto, HttpStatus.OK);
         } catch (InvalidAuthException e) {
@@ -178,7 +179,7 @@ public class GameController {
             return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
         } catch (NoSuchElementException e) {
             JobDto jobDto = new JobDto();
-            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_VACANT_JOB.getUserText());
+            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_JOB_FOR_USER.getUserText());
             return new ResponseEntity<>(jobDto, HttpStatus.OK);
         } catch (Exception e) {
             JobDto jobDto = new JobDto();
@@ -198,6 +199,10 @@ public class GameController {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(GameErrorMessages.GIVEN_JOB_ID_OR_TRUCK_ID_INVALID.getUserText());
             return new ResponseEntity<>(jobDto, HttpStatus.BAD_REQUEST);
+        } catch (OutdatedTruckException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, e.getHttpStatus());
         } catch (IllegalArgumentException e) {
             JobDto jobDto = new JobDto();
             jobDto.setErrorMessage(GameErrorMessages.GIVEN_TERMINAL_NAMES_IN_ROUTE_NOT_VALID.getUserText());

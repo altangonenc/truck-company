@@ -29,4 +29,6 @@ public class Truck {
     private boolean onTheJob;
 
     private FreightTerminals location;
+
+    private double maxMileageOfTruck;
 }
