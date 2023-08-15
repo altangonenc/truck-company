@@ -1,9 +1,10 @@
 package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.TruckCompanyApplication;
-import com.fiseq.truckcompany.dto.LoginForm;
-import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.dto.UserDto;
+import com.fiseq.truckcompany.constants.FreightTerminals;
+import com.fiseq.truckcompany.constants.JobStatus;
+import com.fiseq.truckcompany.dto.*;
+import com.fiseq.truckcompany.entities.Job;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
@@ -51,8 +52,8 @@ public class GameControllerIT {
         // delete test database before each test
         userRepository.deleteAll();
         userProfileRepository.deleteAll();
-        jobRepository.deleteAll();
         truckRepository.deleteAll();
+        jobRepository.deleteAll();
     }
 
     public String getToken() {
@@ -97,7 +98,7 @@ public class GameControllerIT {
     }
 
     @Test
-    public void takeJobAmk() {
+    public void buyTruck() {
         // Given
         String token = getToken();
         String truckModel = "DAF_XF";
@@ -107,7 +108,4 @@ public class GameControllerIT {
         ResponseEntity<TruckDto> response = underTest.buyTruck(token, truckModel, location);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
-
-
-
 }

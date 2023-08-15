@@ -15,6 +15,7 @@ public interface JobRepository extends JpaRepository <Job,Long> {
     int countByOriginationTerminal(FreightTerminals originationTerminal);
     List<Job> findAllByOriginationTerminal(FreightTerminals freightTerminal);
     Optional<Job> findByIdAndOwnerEquals(long id, UserProfile userProfile);
+    Optional<Job> findByIdAndJobStatusEquals(Long id, JobStatus jobStatus);
     Optional<List<Job>> findAllByJobStatusEquals(JobStatus jobStatus);
     Optional<List<Job>> findAllByJobStatusEqualsOrJobStatusEqualsOrJobStatusEqualsAndOwnerEquals(JobStatus jobStatus, JobStatus jobStatus1, JobStatus jobStatus2, UserProfile userProfile);
     void deleteAllByJobStatusEqualsOrJobStatusEquals(JobStatus status, JobStatus jobStatus);

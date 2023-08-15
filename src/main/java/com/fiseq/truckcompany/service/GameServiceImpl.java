@@ -140,8 +140,7 @@ public class GameServiceImpl implements GameService{
         String username = checkTokenAndReturnUsername(token);
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
-        Optional<Job> optionalJob = jobRepository.findByIdAndOwnerEquals(jobId, null);
-        Job job = optionalJob.orElseThrow();
+        Job job = jobRepository.findByIdAndJobStatusEquals(jobId, JobStatus.VACANT).orElseThrow();
 
         Truck truck = truckRepository.findByIdAndOnTheJob(takeJobDto.getTruckId(), false).orElseThrow();
         double speedOfTruck = truck.getTruckModel().getSpeedPerformance();
