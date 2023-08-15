@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userProfile.setUser(user);
         userProfile.setTotalMoney(GameConstants.STARTING_MONEY);
         userProfileRepository.save(userProfile);
+        user.setUserProfile(userProfile);
         userRepository.save(user);
 
         userRegistrationData.setEmail(userDto.getEmail());

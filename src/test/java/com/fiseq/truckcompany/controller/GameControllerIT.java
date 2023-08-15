@@ -4,10 +4,13 @@ import com.fiseq.truckcompany.TruckCompanyApplication;
 import com.fiseq.truckcompany.dto.LoginForm;
 import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.dto.UserDto;
+import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
 import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
+import com.fiseq.truckcompany.service.UserService;
+import com.fiseq.truckcompany.service.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +50,9 @@ public class GameControllerIT {
     public void setUp() {
         // delete test database before each test
         userRepository.deleteAll();
-
+        userProfileRepository.deleteAll();
+        jobRepository.deleteAll();
+        truckRepository.deleteAll();
     }
 
     public String getToken() {
@@ -89,6 +94,18 @@ public class GameControllerIT {
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
 
+    }
+
+    @Test
+    public void takeJobAmk() {
+        // Given
+        String token = getToken();
+        String truckModel = "DAF_XF";
+        String location = "germany";
+
+        // When and Then
+        ResponseEntity<TruckDto> response = underTest.buyTruck(token, truckModel, location);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
 
