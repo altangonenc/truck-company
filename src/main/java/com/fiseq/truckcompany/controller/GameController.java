@@ -9,6 +9,8 @@ import com.fiseq.truckcompany.dto.TruckDto;
 import com.fiseq.truckcompany.dto.Views;
 import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.service.GameService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/game")
+@Api(tags = "Game Controller", description = "In Game Operations")
 public class GameController {
     private final GameService gameService;
 
@@ -148,6 +151,7 @@ public class GameController {
         }
     }
 
+    @ApiOperation(value = "Get All Jobs for all terminals", notes = "Returns all the jobs available.")
     @GetMapping("/jobs")
     public ResponseEntity<JobDto> getAllJobs(@RequestHeader("Authorization") String authorizationHeader) {
         try {
