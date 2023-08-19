@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl("/users/login"); // Kullanıcı girişi için /users/login yolu kullanılır
+        setFilterProcessesUrl("/users/login");
     }
 
     @Override

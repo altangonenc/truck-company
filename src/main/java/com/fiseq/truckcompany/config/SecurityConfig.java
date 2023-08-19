@@ -30,7 +30,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .antMatchers("/users/register").permitAll() // Kayıt işlemine herkesin erişimi olmalı
+                                .antMatchers("/users/register").permitAll()
                                 .antMatchers("/users/recovery-question").permitAll()
                                 .antMatchers("/users/change-password").permitAll()
                                 .antMatchers("/users/login").permitAll()
