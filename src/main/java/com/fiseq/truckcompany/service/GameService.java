@@ -1,9 +1,7 @@
 package com.fiseq.truckcompany.service;
 
 import com.fiseq.truckcompany.constants.TruckModel;
-import com.fiseq.truckcompany.dto.JobDto;
-import com.fiseq.truckcompany.dto.TakeJobDto;
-import com.fiseq.truckcompany.dto.TruckDto;
+import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.exception.*;
 
 import java.util.List;
@@ -26,4 +24,6 @@ public interface GameService {
     JobDto getAllJobsForUser(String token) throws InvalidAuthException;
 
     List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException;
+
+    ItemSellDto sellItem(String authorizationHeader, ItemDto itemDto);
 }

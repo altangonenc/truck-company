@@ -1,19 +1,10 @@
 package com.fiseq.truckcompany.service;
 
 import com.fiseq.truckcompany.constants.*;
-import com.fiseq.truckcompany.dto.JobDto;
-import com.fiseq.truckcompany.dto.RemainingTime;
-import com.fiseq.truckcompany.dto.TakeJobDto;
-import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.entities.Job;
-import com.fiseq.truckcompany.entities.Truck;
-import com.fiseq.truckcompany.entities.User;
-import com.fiseq.truckcompany.entities.UserProfile;
+import com.fiseq.truckcompany.dto.*;
+import com.fiseq.truckcompany.entities.*;
 import com.fiseq.truckcompany.exception.*;
-import com.fiseq.truckcompany.repository.JobRepository;
-import com.fiseq.truckcompany.repository.TruckRepository;
-import com.fiseq.truckcompany.repository.UserProfileRepository;
-import com.fiseq.truckcompany.repository.UserRepository;
+import com.fiseq.truckcompany.repository.*;
 import com.fiseq.truckcompany.utilities.DifferentRegionDistanceCalculator;
 import com.fiseq.truckcompany.utilities.SameRegionDistanceCalculator;
 import org.springframework.http.HttpStatus;
@@ -30,13 +21,15 @@ public class GameServiceImpl implements GameService{
     private final UserProfileRepository userProfileRepository;
     private final TruckRepository truckRepository;
     private final JobRepository jobRepository;
+    private final ItemRepository itemRepository;
 
-    public GameServiceImpl(UserServiceImpl userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository, JobRepository jobRepository) {
+    public GameServiceImpl(UserServiceImpl userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository, JobRepository jobRepository, ItemRepository itemRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
         this.truckRepository = truckRepository;
         this.jobRepository = jobRepository;
+        this.itemRepository = itemRepository;
     }
 
     public List<TruckModel> getAllTruckModels(String token) throws InvalidAuthException {
@@ -50,11 +43,8 @@ public class GameServiceImpl implements GameService{
     }
 
     public TruckDto buyTruck(String token, String truckName, String location) {
-
-        String username = checkTokenAndReturnUsername(token);
+        UserProfile userProfile = extractUserProfileFromToken(token);
         FreightTerminals terminal = checkTerminalNameAndReturn(location);
-        User user = userRepository.findByUserName(username);
-        UserProfile userProfile = user.getUserProfile();
         TruckModel truckModel = TruckModel.valueOf(truckName);
 
         if (checkUsersMoneyAndCompareItWithPriceOfTruck(truckModel.getPrice(), userProfile)) {
@@ -96,9 +86,7 @@ public class GameServiceImpl implements GameService{
     }
 
     public JobDto getAllJobsForUser(String token) throws InvalidAuthException {
-        String username = checkTokenAndReturnUsername(token);
-        User user = userRepository.findByUserName(username);
-        UserProfile userProfile = user.getUserProfile();
+        UserProfile userProfile = extractUserProfileFromToken(token);
         JobDto jobDto = new JobDto();
         List<Job> jobs = jobRepository.findAllByJobStatusEqualsOrJobStatusEqualsOrJobStatusEqualsAndOwnerEquals(JobStatus.IN_PROGRESS,
                                                                                                                 JobStatus.CRASH,
@@ -109,9 +97,7 @@ public class GameServiceImpl implements GameService{
     }
 
     public List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException {
-        String username = checkTokenAndReturnUsername(token);
-        User user = userRepository.findByUserName(username);
-        UserProfile userProfile = user.getUserProfile();
+        UserProfile userProfile = extractUserProfileFromToken(token);
         ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
         ArrayList<TruckDto> allTheTruckDtos = new ArrayList<>();
         for (Truck truck : trucks) {
@@ -137,9 +123,7 @@ public class GameServiceImpl implements GameService{
     }
 
     public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
-        String username = checkTokenAndReturnUsername(token);
-        User user = userRepository.findByUserName(username);
-        UserProfile userProfile = user.getUserProfile();
+        UserProfile userProfile = extractUserProfileFromToken(token);
         Job job = jobRepository.findByIdAndJobStatusEquals(jobId, JobStatus.VACANT).orElseThrow();
 
         Truck truck = truckRepository.findByIdAndOnTheJob(takeJobDto.getTruckId(), false).orElseThrow();
@@ -175,9 +159,7 @@ public class GameServiceImpl implements GameService{
     }
 
     public JobDto finishJob(String token, Long jobId) throws InvalidAuthException, JobIsNotFinishedException, TruckCrashedException {
-        String username = checkTokenAndReturnUsername(token);
-        User user = userRepository.findByUserName(username);
-        UserProfile userProfile = user.getUserProfile();
+        UserProfile userProfile = extractUserProfileFromToken(token);
         Optional<Job> optionalJob = jobRepository.findByIdAndOwnerEquals(jobId, userProfile);
         Job job = optionalJob.orElseThrow();
         Truck truck = job.getTruckOnTheJob();
@@ -315,5 +297,37 @@ public class GameServiceImpl implements GameService{
             return true;
         }
         return false;
+    }
+
+    private UserProfile extractUserProfileFromToken(String token) {
+        String username = checkTokenAndReturnUsername(token);
+        User user = userRepository.findByUserName(username);
+        return user.getUserProfile();
+    }
+
+    public ItemSellDto sellItem(String token, ItemDto itemDto) {
+        UserProfile userProfile = extractUserProfileFromToken(token);
+        validatePriceOfItem(itemDto.getPrice());
+        Truck truck = getTruckWhichIsNotOnAnyJob(userProfile, itemDto);
+        Item item = new Item();
+        item.setPrice(itemDto.getPrice());
+        item.setTruck(truck);
+        itemRepository.save(item);
+
+        ItemSellDto itemSellDto = new ItemSellDto();
+        itemSellDto.setSuccessMessage(GameSuccessMessages.ITEM_SUCCESSFULLY_PLACED_IN_MARKETPLACE.getUserText());
+        itemSellDto.setTruckId(truck.getId());
+        itemSellDto.setItemId(item.getId());
+        return itemSellDto;
+    }
+
+    private Truck getTruckWhichIsNotOnAnyJob(UserProfile userProfile, ItemDto itemDto) {
+        return truckRepository.findByOwnerAndIdAndOnTheJob(userProfile, itemDto.getItemId(), false).orElseThrow();
+    }
+
+    private void validatePriceOfItem(double price) {
+        if (price > GameConstants.UPPER_LIMIT_PRICE || price < GameConstants.LOWER_LIMIT_PRICE) {
+            throw new IncorrectPricingException();
+        }
     }
 }

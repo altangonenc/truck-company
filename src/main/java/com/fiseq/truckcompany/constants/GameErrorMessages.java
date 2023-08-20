@@ -16,8 +16,11 @@ public enum GameErrorMessages {
     THERE_IS_NO_JOB_FOR_USER("There is no job for user."),
     THERE_IS_NO_VACANT_JOB("There is no vacant job."),
     TRUCK_CRASHED("Your truck crashed on road. Sorry to hear that but you cannot take any money for this job.(Don't forget to pay your gas :) )"),
+    GIVEN_TRUCK_ID_INVALID("Given truck id is invalid."),
     TRUCK_OUTDATED("Specified truck cannot do this job. Truck is outdated. "),
+    INCORRECT_PRICING("Incorrect pricing. Please price within the valid range. "),
     USER_HAS_NO_TRUCK("Specified User doesn't have any truck.");
+
     private final String name;
 
     GameErrorMessages(String name) {

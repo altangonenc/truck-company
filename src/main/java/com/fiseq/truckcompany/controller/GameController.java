@@ -3,10 +3,7 @@ package com.fiseq.truckcompany.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fiseq.truckcompany.constants.GameErrorMessages;
 import com.fiseq.truckcompany.constants.TruckModel;
-import com.fiseq.truckcompany.dto.JobDto;
-import com.fiseq.truckcompany.dto.TakeJobDto;
-import com.fiseq.truckcompany.dto.TruckDto;
-import com.fiseq.truckcompany.dto.Views;
+import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.service.GameService;
 import io.swagger.annotations.Api;
@@ -257,4 +254,30 @@ public class GameController {
         }
 
     }
+
+    @PostMapping("/item/sell")
+    public ResponseEntity<?> sellItem(@RequestHeader("Authorization") String authorizationHeader,
+                                      @RequestBody ItemDto itemDto) {
+        try {
+            ItemSellDto itemSellDto = gameService.sellItem(authorizationHeader, itemDto);
+            return new ResponseEntity<>(itemSellDto, HttpStatus.CREATED);
+        } catch (InvalidAuthException e) {
+            ItemSellDto itemSellDto = new ItemSellDto();
+            itemSellDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(itemSellDto, HttpStatus.UNAUTHORIZED);
+        } catch (NoSuchElementException e) {
+            ItemSellDto itemSellDto = new ItemSellDto();
+            itemSellDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_ID_INVALID.getUserText());
+            return new ResponseEntity<>(itemSellDto, HttpStatus.BAD_REQUEST);
+        } catch (IncorrectPricingException e) {
+            ItemSellDto itemSellDto = new ItemSellDto();
+            itemSellDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(itemSellDto, e.getHttpStatus());
+        } catch (Exception e) {
+            ItemSellDto itemSellDto = new ItemSellDto();
+            itemSellDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(itemSellDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
