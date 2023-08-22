@@ -17,7 +17,7 @@ In order to be understandable, APIs are presented under 2 headings.
 * _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
 
 
-## :1::USER MANAGEMENT API'S:::
+## USER MANAGEMENT API'S
 
 ### SIGN UP API (POST):
 * You can sign up if there is no email or username identical as yours.
@@ -86,7 +86,7 @@ In order to be understandable, APIs are presented under 2 headings.
 * OPTION2:
   curl --location 'localhost:8080/users/recovery-question'
 
-##:2::GAMEPLAY API'S:::
+## GAMEPLAY API'S
 
 ### GET ALL TRUCK MODELS API (GET):
 * This API provides all the truck models to user.
