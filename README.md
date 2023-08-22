@@ -17,9 +17,9 @@ In order to be understandable, APIs are presented under 2 headings.
 * _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
 
 
-**:1::USER MANAGEMENT API'S:::**
+## :1::USER MANAGEMENT API'S:::
 
-**SIGN UP API (POST):**
+### SIGN UP API (POST):
 * You can sign up if there is no email or username identical as yours.
 * You can sign up if your all credentials are present(not empty).
 * curl --location 'localhost:8080/users/register' \
@@ -35,7 +35,7 @@ In order to be understandable, APIs are presented under 2 headings.
   }'
 
 
-**LOGIN API (POST):**
+### *LOGIN API (POST):
 * This API stands for the token provider for users.
 * You should use LOGIN API if you want to play game.
 * When you used this API take the token in response header. And then you can use all the other API's with giving this token to them.
@@ -47,7 +47,7 @@ In order to be understandable, APIs are presented under 2 headings.
   }'
 
 
-**PROFILE API (GET):**
+### PROFILE API (GET):
 * This API stands for the check User's information.
 * Only takes Bearer token which produced with the specified user.
 * curl --location 'localhost:8080/users/profile' \
@@ -55,7 +55,7 @@ In order to be understandable, APIs are presented under 2 headings.
   --data ''
 
 
-**CHANGE PASSWORD API (POST):**
+### CHANGE PASSWORD API (POST):
 * This API changes the password of user.
 * It takes all the information of user and a new password.
 * Encoded "recoveryAnswer"  stores in DB just like password.
@@ -74,7 +74,7 @@ In order to be understandable, APIs are presented under 2 headings.
   }'
 
 
-**GET RECOVERY QUESTION/QUESTIONS (GET):**
+### GET RECOVERY QUESTION/QUESTIONS (GET):
 * This API has 2 modes.
 * If you use it with a valid token of a user, you will get the chosen recovery question of user
 * If you use it without any token or with an invalid token, you will get all the questions. (For client integration)
@@ -86,35 +86,35 @@ In order to be understandable, APIs are presented under 2 headings.
 * OPTION2:
   curl --location 'localhost:8080/users/recovery-question'
 
-**:2::GAMEPLAY API'S:::**
+##:2::GAMEPLAY API'S:::
 
-**GET ALL TRUCK MODELS API (GET):**
+### GET ALL TRUCK MODELS API (GET):
 * This API provides all the truck models to user.
 * curl --location 'localhost:8080/api/v1/game/trucks' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg'
 
-**GET TRUCK ATTRIBUTES API (GET):**
+### GET TRUCK ATTRIBUTES API (GET):
 * This API provides the specified trucks attributes. 
 * curl --location 'localhost:8080/api/v1/game/truck/attributes/DAF_XF' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' 
 
-**BUY TRUCK API (POST):**
+### BUY TRUCK API (POST):
 * You can buy a truck using this API. But you need to be careful where you want to buy it. In the example curl request, user prefers germany. 
 * curl --location --request POST 'localhost:8080/api/v1/game/truck/buy/DAF_XF/germany' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' 
 
-**GET ALL JOBS IN TERMINAL API (GET)**
+### GET ALL JOBS IN TERMINAL API (GET)
 * You can get all the jobs in a terminal using this API. 
 * curl --location 'localhost:8080/api/v1/game/jobs/germany' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg'
 * For example. This curl request gives you all the jobs in Germany location. 
 
-**GET ALL JOBS API (GET)**
+### GET ALL JOBS API (GET)
 * You can get all the jobs in the whole game with using this API.
 * curl --location 'localhost:8080/api/v1/game/jobs' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxMDk5OTk2fQ.oxv4s5w8XiYPjI7CsNkgmYauH4C-Bu75ohNigKWJm4qakP_Pa3hiyIrWxfcqYsyvfiSZsevBUnZzOeY_hUgByQ' 
 
-**TAKE JOB API (POST)**
+### TAKE JOB API (POST)
 * You can take a job and start it with using this API.
 * You can specify your route, but this is only useful if you are traveling by ship. The rest of the time the algorithm will take you by the shortest highway.  
 * If you specify route: 
@@ -133,13 +133,13 @@ In order to be understandable, APIs are presented under 2 headings.
   "truckId" : 1
   }' 
 
-**FINISH JOB API (POST)**
+### FINISH JOB API (POST)
 * When the completion time of your job comes. You can use this API, for getting reward of job. 
 * curl --location --request POST 'localhost:8080/api/v1/game/job/191/finish' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkxNTc2MDQ4fQ.9XuZ6RvkOP5Z-z_xlR0vc_Y-GE-HwxWtp6iIONM1iGVvkZtzTLTmeeeojUjML9AA4-CHkbdZoXk9IV_FyJpgMg' \
   --data ''
 
-* **GET ALL TRUCKS OF USER API (GET)**
+### GET ALL TRUCKS OF USER API (GET)
 * This API will return all trucks owned by the user.  
 * curl --location 'localhost:8080/api/v1/game/truck/get/all' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkyNDgwNjU3fQ.wZP-nqq8JVbiyzvYVW7R4BVqOSUtgL3hM8_IDgHfPiX6AgliliVFGREJphKLk2ByG2V6uc9Avy82jww7T0ptOQ' 
