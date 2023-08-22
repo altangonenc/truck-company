@@ -55,7 +55,7 @@ public class GameServiceImpl implements GameService{
             Truck truck = new Truck();
             truck.setTruckModel(truckModel);
             truck.setOwner(userProfile);
-            truck.setOnTheJob(false);
+            truck.setUnavailable(false);
             truck.setLocation(terminal);
             truck.setMaxMileageOfTruck(truckModel.getMaxMileageOfTruck());
             truckRepository.save(truck);
@@ -114,7 +114,7 @@ public class GameServiceImpl implements GameService{
             attributes.put("maxMileageOfTruck", truck.getMaxMileageOfTruck());
             truckDto.setTruckModelAttributes(attributes);
             truckDto.setTruckId(truck.getId());
-            truckDto.setOnTheJob(truck.isOnTheJob());
+            truckDto.setOnTheJob(truck.isUnavailable());
 
             allTheTruckDtos.add(truckDto);
         }
@@ -126,7 +126,7 @@ public class GameServiceImpl implements GameService{
         UserProfile userProfile = extractUserProfileFromToken(token);
         Job job = jobRepository.findByIdAndJobStatusEquals(jobId, JobStatus.VACANT).orElseThrow();
 
-        Truck truck = truckRepository.findByIdAndOnTheJob(takeJobDto.getTruckId(), false).orElseThrow();
+        Truck truck = truckRepository.findByIsUnavailableAndId(false, takeJobDto.getTruckId()).orElseThrow();
         double speedOfTruck = truck.getTruckModel().getSpeedPerformance();
 
         double distance = calculateDistance(takeJobDto, job, truck);
@@ -136,7 +136,7 @@ public class GameServiceImpl implements GameService{
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime approximateCompletionOfJobTime = now.plusHours((long) distance / (long) speedOfTruck);
 
-        truck.setOnTheJob(true);
+        truck.setUnavailable(true);
         truck.setMaxMileageOfTruck(truck.getMaxMileageOfTruck() - distance);
         truckRepository.save(truck);
 
@@ -181,7 +181,7 @@ public class GameServiceImpl implements GameService{
             userProfile.setTotalMoney(userProfile.getTotalMoney() - spentFuel);
             jobRepository.save(job);
             userProfileRepository.save(userProfile);
-            truck.setOnTheJob(false);
+            truck.setUnavailable(false);
             truckRepository.save(truck);
             throw new TruckCrashedException();
         }
@@ -192,7 +192,7 @@ public class GameServiceImpl implements GameService{
         job.setJobStatus(JobStatus.SUCCESS);
         jobRepository.save(job);
 
-        truck.setOnTheJob(false);
+        truck.setUnavailable(false);
         truck.setLocation(job.getDestinationTerminal());
         truckRepository.save(truck);
 
@@ -308,10 +308,15 @@ public class GameServiceImpl implements GameService{
     public ItemSellDto sellItem(String token, ItemDto itemDto) {
         UserProfile userProfile = extractUserProfileFromToken(token);
         validatePriceOfItem(itemDto.getPrice());
-        Truck truck = getTruckWhichIsNotOnAnyJob(userProfile, itemDto);
+
+        Truck truck = getTruckWhichIsNotUnavailable(userProfile, itemDto);
+        truck.setUnavailable(true);
+
         Item item = new Item();
         item.setPrice(itemDto.getPrice());
         item.setTruck(truck);
+
+        truckRepository.save(truck);
         itemRepository.save(item);
 
         ItemSellDto itemSellDto = new ItemSellDto();
@@ -321,8 +326,8 @@ public class GameServiceImpl implements GameService{
         return itemSellDto;
     }
 
-    private Truck getTruckWhichIsNotOnAnyJob(UserProfile userProfile, ItemDto itemDto) {
-        return truckRepository.findByOwnerAndIdAndOnTheJob(userProfile, itemDto.getItemId(), false).orElseThrow();
+    private Truck getTruckWhichIsNotUnavailable(UserProfile userProfile, ItemDto itemDto) {
+        return truckRepository.findByOwnerAndIdAndIsUnavailable(userProfile, itemDto.getItemId(), false).orElseThrow();
     }
 
     private void validatePriceOfItem(double price) {

@@ -26,7 +26,7 @@ public class Truck {
 
     private TruckModel truckModel;
 
-    private boolean onTheJob;
+    private boolean isUnavailable;
 
     private FreightTerminals location;
 

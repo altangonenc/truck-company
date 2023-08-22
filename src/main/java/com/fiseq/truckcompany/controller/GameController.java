@@ -256,7 +256,7 @@ public class GameController {
     }
 
     @PostMapping("/item/sell")
-    public ResponseEntity<?> sellItem(@RequestHeader("Authorization") String authorizationHeader,
+    public ResponseEntity<ItemSellDto> sellItem(@RequestHeader("Authorization") String authorizationHeader,
                                       @RequestBody ItemDto itemDto) {
         try {
             ItemSellDto itemSellDto = gameService.sellItem(authorizationHeader, itemDto);

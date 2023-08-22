@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface TruckRepository extends JpaRepository<Truck,Long> {
-    Optional<Truck> findByIdAndOnTheJob(long id, boolean isOnTheJob);
+    Optional<Truck> findByIsUnavailableAndId(boolean isUnavailable, Long id);
     Optional<ArrayList<Truck>> findAllByOwner(UserProfile userProfile);
-    Optional<Truck> findByOwnerAndIdAndOnTheJob(UserProfile userProfile, Long id, boolean onTheJob);
+    Optional<Truck> findByOwnerAndIdAndIsUnavailable(UserProfile userProfile, Long id, boolean isUnavailable);
 }
