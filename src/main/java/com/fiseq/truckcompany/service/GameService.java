@@ -25,5 +25,7 @@ public interface GameService {
 
     List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException;
 
-    ItemSellDto sellItem(String authorizationHeader, ItemDto itemDto);
+    ItemSellDto sellItem(String authorizationHeader, ItemSellRequestDto itemSellRequestDto);
+
+    MarketplaceDto getAllItemsInMarketplace(String authorizationHeader);
 }

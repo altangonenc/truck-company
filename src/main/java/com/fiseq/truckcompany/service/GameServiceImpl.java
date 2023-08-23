@@ -305,15 +305,15 @@ public class GameServiceImpl implements GameService{
         return user.getUserProfile();
     }
 
-    public ItemSellDto sellItem(String token, ItemDto itemDto) {
+    public ItemSellDto sellItem(String token, ItemSellRequestDto itemSellRequestDto) {
         UserProfile userProfile = extractUserProfileFromToken(token);
-        validatePriceOfItem(itemDto.getPrice());
+        validatePriceOfItem(itemSellRequestDto.getPrice());
 
-        Truck truck = getTruckWhichIsNotUnavailable(userProfile, itemDto);
+        Truck truck = getTruckWhichIsNotUnavailable(userProfile, itemSellRequestDto);
         truck.setUnavailable(true);
 
         Item item = new Item();
-        item.setPrice(itemDto.getPrice());
+        item.setPrice(itemSellRequestDto.getPrice());
         item.setTruck(truck);
 
         truckRepository.save(truck);
@@ -326,13 +326,34 @@ public class GameServiceImpl implements GameService{
         return itemSellDto;
     }
 
-    private Truck getTruckWhichIsNotUnavailable(UserProfile userProfile, ItemDto itemDto) {
-        return truckRepository.findByOwnerAndIdAndIsUnavailable(userProfile, itemDto.getItemId(), false).orElseThrow();
+    private Truck getTruckWhichIsNotUnavailable(UserProfile userProfile, ItemSellRequestDto itemSellRequestDto) {
+        return truckRepository.findByOwnerAndIdAndIsUnavailable(userProfile, itemSellRequestDto.getItemId(), false).orElseThrow();
     }
 
     private void validatePriceOfItem(double price) {
         if (price > GameConstants.UPPER_LIMIT_PRICE || price < GameConstants.LOWER_LIMIT_PRICE) {
             throw new IncorrectPricingException();
         }
+    }
+
+    public MarketplaceDto getAllItemsInMarketplace(String authorizationHeader) {
+        checkToken(authorizationHeader);
+        ArrayList<TruckItemDto> truckItemDtos = getAllItems();
+        MarketplaceDto marketplaceDto = new MarketplaceDto();
+        marketplaceDto.setItems(truckItemDtos);
+        return marketplaceDto;
+    }
+
+    private ArrayList<TruckItemDto> getAllItems() {
+        List<Item> listOfTruckItems = itemRepository.findAll();
+        ArrayList<TruckItemDto> truckItemDtos = new ArrayList<>();
+        for (Item item : listOfTruckItems) {
+            TruckItemDto truckItemDto = new TruckItemDto();
+            truckItemDto.setTruckId(item.getId());
+            truckItemDto.setTruckModel(item.getTruck().getTruckModel());
+            truckItemDto.setPrice(item.getPrice());
+            truckItemDtos.add(truckItemDto);
+        }
+        return truckItemDtos;
     }
 }

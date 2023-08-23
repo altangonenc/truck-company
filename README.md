@@ -143,3 +143,13 @@ In order to be understandable, APIs are presented under 2 headings.
 * This API will return all trucks owned by the user.  
 * curl --location 'localhost:8080/api/v1/game/truck/get/all' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkyNDgwNjU3fQ.wZP-nqq8JVbiyzvYVW7R4BVqOSUtgL3hM8_IDgHfPiX6AgliliVFGREJphKLk2ByG2V6uc9Avy82jww7T0ptOQ' 
+
+### SELL ITEM API (POST)
+* With this API, truck sales transactions are made using Price and truckId values.
+* curl --location 'localhost:8080/api/v1/game/item/sell' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWtzYXNsaWFsdGFuIiwiZXhwIjoxNjkzNTk2Mjk4fQ.v39qn--kgW0v1vuRP5bFOG8HtDWZB38oGwV-6_AXv24GyOUJkK0hr3OlGCMGFgLZ3rU4vTdtj_-bWIqChruICQ' \
+  --data '{
+  "price" : 10565464,
+  "itemId" : 1
+  }'

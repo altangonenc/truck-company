@@ -257,9 +257,9 @@ public class GameController {
 
     @PostMapping("/item/sell")
     public ResponseEntity<ItemSellDto> sellItem(@RequestHeader("Authorization") String authorizationHeader,
-                                      @RequestBody ItemDto itemDto) {
+                                      @RequestBody ItemSellRequestDto itemSellRequestDto) {
         try {
-            ItemSellDto itemSellDto = gameService.sellItem(authorizationHeader, itemDto);
+            ItemSellDto itemSellDto = gameService.sellItem(authorizationHeader, itemSellRequestDto);
             return new ResponseEntity<>(itemSellDto, HttpStatus.CREATED);
         } catch (InvalidAuthException e) {
             ItemSellDto itemSellDto = new ItemSellDto();
@@ -277,6 +277,23 @@ public class GameController {
             ItemSellDto itemSellDto = new ItemSellDto();
             itemSellDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(itemSellDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/item/marketplace")
+    public ResponseEntity<MarketplaceDto> getAllItemsInMarketplace(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            MarketplaceDto marketplaceDto = gameService.getAllItemsInMarketplace(authorizationHeader);
+            return new ResponseEntity<>(marketplaceDto, HttpStatus.OK);
+
+        } catch (InvalidAuthException e) {
+            MarketplaceDto marketplaceDto = new MarketplaceDto();
+            marketplaceDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(marketplaceDto, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            MarketplaceDto marketplaceDto = new MarketplaceDto();
+            marketplaceDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(marketplaceDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
