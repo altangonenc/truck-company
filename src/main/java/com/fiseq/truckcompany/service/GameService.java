@@ -27,5 +27,5 @@ public interface GameService {
 
     ItemSellDto sellItem(String authorizationHeader, ItemSellRequestDto itemSellRequestDto);
 
-    MarketplaceDto getAllItemsInMarketplace(String authorizationHeader);
+    MarketplaceDto getAllItemsInMarketplace(String authorizationHeader, Double minPrice, Double maxPrice, String truckModel);
 }

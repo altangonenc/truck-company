@@ -336,24 +336,41 @@ public class GameServiceImpl implements GameService{
         }
     }
 
-    public MarketplaceDto getAllItemsInMarketplace(String authorizationHeader) {
+    public MarketplaceDto getAllItemsInMarketplace(String authorizationHeader, Double minPrice, Double maxPrice, String truckName) {
         checkToken(authorizationHeader);
-        ArrayList<TruckItemDto> truckItemDtos = getAllItems();
+        ArrayList<TruckItemDto> truckItemDtos = getFilteredItems(minPrice, maxPrice, truckName);
         MarketplaceDto marketplaceDto = new MarketplaceDto();
         marketplaceDto.setItems(truckItemDtos);
         return marketplaceDto;
     }
 
-    private ArrayList<TruckItemDto> getAllItems() {
-        List<Item> listOfTruckItems = itemRepository.findAll();
+    private ArrayList<TruckItemDto> getFilteredItems(Double minPrice, Double maxPrice, String truckName) {
+        List<Item> listOfTruckItems = getAllItemsFilteredByTruckName(truckName);
+
         ArrayList<TruckItemDto> truckItemDtos = new ArrayList<>();
+
         for (Item item : listOfTruckItems) {
-            TruckItemDto truckItemDto = new TruckItemDto();
-            truckItemDto.setTruckId(item.getId());
-            truckItemDto.setTruckModel(item.getTruck().getTruckModel());
-            truckItemDto.setPrice(item.getPrice());
-            truckItemDtos.add(truckItemDto);
+            if ((minPrice == null || item.getPrice() >= minPrice) &&
+                    (maxPrice == null || item.getPrice() <= maxPrice)) {
+
+                TruckItemDto truckItemDto = new TruckItemDto();
+                truckItemDto.setTruckId(item.getId());
+                truckItemDto.setTruckModel(item.getTruck().getTruckModel());
+                truckItemDto.setPrice(item.getPrice());
+                truckItemDtos.add(truckItemDto);
+            }
         }
         return truckItemDtos;
+    }
+
+    private List<Item> getAllItemsFilteredByTruckName(String truckName) {
+        List<Item> listOfTruckItems;
+        if (truckName != null && !truckName.isEmpty()) {
+            TruckModel truckModel = TruckModel.valueOf(truckName);
+            listOfTruckItems = itemRepository.findByTruck_TruckModel(truckModel).orElseThrow();
+        } else {
+            listOfTruckItems = itemRepository.findAll();
+        }
+        return listOfTruckItems;
     }
 }

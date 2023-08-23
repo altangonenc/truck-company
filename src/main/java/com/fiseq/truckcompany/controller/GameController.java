@@ -281,11 +281,17 @@ public class GameController {
     }
 
     @GetMapping("/item/marketplace")
-    public ResponseEntity<MarketplaceDto> getAllItemsInMarketplace(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<MarketplaceDto> getAllItemsInMarketplace(@RequestHeader("Authorization") String authorizationHeader,
+                                                                   @RequestParam(required = false) Double minPrice,
+                                                                   @RequestParam(required = false) Double maxPrice,
+                                                                   @RequestParam(required = false) String truckModel) {
         try {
-            MarketplaceDto marketplaceDto = gameService.getAllItemsInMarketplace(authorizationHeader);
+            MarketplaceDto marketplaceDto = gameService.getAllItemsInMarketplace(authorizationHeader, minPrice, maxPrice, truckModel);
             return new ResponseEntity<>(marketplaceDto, HttpStatus.OK);
-
+        } catch (IllegalArgumentException e) {
+            MarketplaceDto marketplaceDto = new MarketplaceDto();
+            marketplaceDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_NOT_FOUND.getUserText());
+            return new ResponseEntity<>(marketplaceDto, HttpStatus.NOT_FOUND);
         } catch (InvalidAuthException e) {
             MarketplaceDto marketplaceDto = new MarketplaceDto();
             marketplaceDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
