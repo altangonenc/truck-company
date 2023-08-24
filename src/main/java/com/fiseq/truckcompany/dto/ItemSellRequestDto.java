@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ItemSellRequestDto {
     private double price;
-    private Long itemId;
+    private Long truckId;
 }

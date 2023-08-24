@@ -6,6 +6,7 @@ public enum GameErrorMessages {
     GIVEN_TRUCK_MODEL_NOT_FOUND("Given truck model is not valid."),
     SOMETHING_WENT_WRONG_WHILE_BUY_TRUCK("Something went wrong while you try to bought a truck."),
     USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_TRUCK("User does not have enough money to buy this truck."),
+    USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_ITEM("User does not have enough money to buy this item."),
     GIVEN_TERMINAL_COUNTRY_NAME_NOT_FOUND("Given terminal name is not valid."),
     GIVEN_TERMINAL_NAMES_IN_ROUTE_NOT_VALID("Given route was wrong. Check your specified countries."),
     GIVEN_JOB_ID_OR_TRUCK_ID_INVALID("Given job id or selected truck id is not valid"),

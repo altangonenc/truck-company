@@ -28,4 +28,6 @@ public interface GameService {
     ItemSellDto sellItem(String authorizationHeader, ItemSellRequestDto itemSellRequestDto);
 
     MarketplaceDto getAllItemsInMarketplace(String authorizationHeader, Double minPrice, Double maxPrice, String truckModel);
+
+    ItemBuyDto buyItem(String authorizationHeader, Long itemId);
 }

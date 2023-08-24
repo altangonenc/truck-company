@@ -303,4 +303,30 @@ public class GameController {
         }
     }
 
+    @PostMapping("/item/{id}/buy")
+    public ResponseEntity<ItemBuyDto> buyItem(@RequestHeader("Authorization") String authorizationHeader,
+                                              @PathVariable("id") Long itemId) {
+        try {
+            ItemBuyDto itemBuyDto = gameService.buyItem(authorizationHeader, itemId);
+            return new ResponseEntity<>(itemBuyDto, HttpStatus.CREATED);
+        } catch (NotEnoughMoneyException e) {
+            ItemBuyDto itemBuyDto = new ItemBuyDto();
+            itemBuyDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(itemBuyDto, e.getHttpStatus());
+        } catch (NoSuchElementException e) {
+            ItemBuyDto itemBuyDto = new ItemBuyDto();
+            itemBuyDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_ID_INVALID.getUserText());
+            return new ResponseEntity<>(itemBuyDto, HttpStatus.BAD_REQUEST);
+        } catch (InvalidAuthException e) {
+            ItemBuyDto itemBuyDto = new ItemBuyDto();
+            itemBuyDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(itemBuyDto, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            ItemBuyDto itemBuyDto = new ItemBuyDto();
+            itemBuyDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(itemBuyDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 }

@@ -66,7 +66,7 @@ public class GameServiceImpl implements GameService{
             return truckDto;
         }
 
-        throw new NotEnoughMoneyException();
+        throw new NotEnoughMoneyException(HttpStatus.BAD_REQUEST, GameErrorMessages.USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_TRUCK);
     }
 
     public JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException {
@@ -327,7 +327,7 @@ public class GameServiceImpl implements GameService{
     }
 
     private Truck getTruckWhichIsNotUnavailable(UserProfile userProfile, ItemSellRequestDto itemSellRequestDto) {
-        return truckRepository.findByOwnerAndIdAndIsUnavailable(userProfile, itemSellRequestDto.getItemId(), false).orElseThrow();
+        return truckRepository.findByOwnerAndIdAndIsUnavailable(userProfile, itemSellRequestDto.getTruckId(), false).orElseThrow();
     }
 
     private void validatePriceOfItem(double price) {
@@ -372,5 +372,48 @@ public class GameServiceImpl implements GameService{
             listOfTruckItems = itemRepository.findAll();
         }
         return listOfTruckItems;
+    }
+
+    public ItemBuyDto buyItem(String authorizationHeader, Long itemId) {
+        String username = checkTokenAndReturnUsername(authorizationHeader);
+        Item item = itemRepository.findById(itemId).orElseThrow();
+        doPurchase(item, username);
+        deleteItemFromMarketplace(item);
+        ItemBuyDto itemBuyDto = new ItemBuyDto();
+        itemBuyDto.setItemId(item.getId());
+        itemBuyDto.setSuccessMessage(GameSuccessMessages.SUCCESSFULLY_BOUGHT_ITEM.getUserText());
+        return itemBuyDto;
+    }
+
+    private void deleteItemFromMarketplace(Item item) {
+        itemRepository.delete(item);
+    }
+
+    private void doPurchase(Item item, String username) {
+        User user = userRepository.findByUserName(username);
+        UserProfile userProfile = user.getUserProfile();
+        doesUserHaveEnoughMoneyToBuy(item, userProfile);
+        exchangeMoneyBetweenBuyerAndSeller(item, userProfile);
+        exchangeItemBetweenBuyerAndSeller(item, userProfile);
+    }
+
+    private void doesUserHaveEnoughMoneyToBuy(Item item, UserProfile userProfile) {
+        if (item.getPrice() > userProfile.getTotalMoney()) {
+            throw new NotEnoughMoneyException(HttpStatus.BAD_REQUEST, GameErrorMessages.USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_ITEM);
+        }
+    }
+
+    private void exchangeMoneyBetweenBuyerAndSeller(Item item, UserProfile buyer) {
+        UserProfile seller = item.getTruck().getOwner();
+        buyer.setTotalMoney(buyer.getTotalMoney() - item.getPrice());
+        seller.setTotalMoney(seller.getTotalMoney() + item.getPrice());
+        userProfileRepository.save(buyer);
+        userProfileRepository.save(seller);
+    }
+
+    private void exchangeItemBetweenBuyerAndSeller(Item item, UserProfile buyer) {
+        Truck truck = item.getTruck();
+        truck.setOwner(buyer);
+        truckRepository.save(truck);
     }
 }
