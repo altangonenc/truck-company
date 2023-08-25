@@ -392,9 +392,18 @@ public class GameServiceImpl implements GameService{
     private void doPurchase(Item item, String username) {
         User user = userRepository.findByUserName(username);
         UserProfile userProfile = user.getUserProfile();
+
+        checkTrucksOwnership(userProfile, item);
         doesUserHaveEnoughMoneyToBuy(item, userProfile);
+
         exchangeMoneyBetweenBuyerAndSeller(item, userProfile);
         exchangeItemBetweenBuyerAndSeller(item, userProfile);
+    }
+
+    private void checkTrucksOwnership(UserProfile userProfile, Item item) {
+        if (userProfile == item.getTruck().getOwner()) {
+            throw new CannotBuyTruckException();
+        }
     }
 
     private void doesUserHaveEnoughMoneyToBuy(Item item, UserProfile userProfile) {
@@ -414,6 +423,7 @@ public class GameServiceImpl implements GameService{
     private void exchangeItemBetweenBuyerAndSeller(Item item, UserProfile buyer) {
         Truck truck = item.getTruck();
         truck.setOwner(buyer);
+        truck.setUnavailable(false);
         truckRepository.save(truck);
     }
 }

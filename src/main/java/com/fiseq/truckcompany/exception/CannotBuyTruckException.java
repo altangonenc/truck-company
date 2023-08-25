@@ -7,5 +7,5 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class CannotBuyTruckException extends RuntimeException{
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-    private final GameErrorMessages gameErrorMessages = GameErrorMessages.SOMETHING_WENT_WRONG_WHILE_BUY_TRUCK;
+    private final GameErrorMessages gameErrorMessages = GameErrorMessages.CANNOT_BUY_TRUCK;
 }

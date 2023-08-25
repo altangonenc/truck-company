@@ -309,6 +309,10 @@ public class GameController {
         try {
             ItemBuyDto itemBuyDto = gameService.buyItem(authorizationHeader, itemId);
             return new ResponseEntity<>(itemBuyDto, HttpStatus.CREATED);
+        } catch (CannotBuyTruckException e) {
+            ItemBuyDto itemBuyDto = new ItemBuyDto();
+            itemBuyDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(itemBuyDto, e.getHttpStatus());
         } catch (NotEnoughMoneyException e) {
             ItemBuyDto itemBuyDto = new ItemBuyDto();
             itemBuyDto.setErrorMessage(e.getGameErrorMessages().getUserText());
