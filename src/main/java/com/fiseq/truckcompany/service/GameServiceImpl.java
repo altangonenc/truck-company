@@ -8,6 +8,7 @@ import com.fiseq.truckcompany.repository.*;
 import com.fiseq.truckcompany.utilities.DifferentRegionDistanceCalculator;
 import com.fiseq.truckcompany.utilities.SameRegionDistanceCalculator;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -32,94 +33,213 @@ public class GameServiceImpl implements GameService{
         this.itemRepository = itemRepository;
     }
 
-    public List<TruckModel> getAllTruckModels(String token) throws InvalidAuthException {
-        checkToken(token);
-        return new ArrayList<>(Arrays.asList(TruckModel.values()));
+    public ResponseEntity<TruckDto> getAllTruckModels(String token) throws InvalidAuthException {
+        try {
+            checkToken(token);
+            ArrayList<TruckModel> truckModels = new ArrayList<>(Arrays.asList(TruckModel.values()));
+            TruckDto truckDto = new TruckDto();
+            truckDto.setTruckModels(truckModels);
+            return new ResponseEntity<>(truckDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (Exception e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    public TruckModel getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException {
-        checkToken(token);
-        return TruckModel.valueOf(truckModel);
-    }
-
-    public TruckDto buyTruck(String token, String truckName, String location) {
-        UserProfile userProfile = extractUserProfileFromToken(token);
-        FreightTerminals terminal = checkTerminalNameAndReturn(location);
-        TruckModel truckModel = TruckModel.valueOf(truckName);
-
-        if (checkUsersMoneyAndCompareItWithPriceOfTruck(truckModel.getPrice(), userProfile)) {
-            double moneyLeft = userProfile.getTotalMoney() - truckModel.getPrice();
-            userProfile.setTotalMoney(moneyLeft);
-            userProfileRepository.save(userProfile);
-
-            Truck truck = new Truck();
-            truck.setTruckModel(truckModel);
-            truck.setOwner(userProfile);
-            truck.setUnavailable(false);
-            truck.setLocation(terminal);
-            truck.setMaxMileageOfTruck(truckModel.getMaxMileageOfTruck());
-            truckRepository.save(truck);
-
+    public ResponseEntity<TruckDto> getTruckAttributes(String token, String truckModelName) throws InvalidAuthException, IllegalArgumentException {
+        try {
+            checkToken(token);
+            TruckModel truckModel = TruckModel.valueOf(truckModelName);
             TruckDto truckDto = new TruckDto();
             truckDto.setTruckModel(truckModel);
-            truckDto.setMoneyLeftInAccount(moneyLeft);
-            return truckDto;
-        }
+            HashMap<String,Object> truckAttributes = new HashMap<>();
+            truckAttributes.put("model",truckModel.getModel());
+            truckAttributes.put("brand",truckModel.getBrand());
+            truckAttributes.put("crashRisk",truckModel.getCrashRisk());
+            truckAttributes.put("id",truckModel.getTruckModelId());
+            truckAttributes.put("fuelPerformance",truckModel.getFuelConsumingPerformance());
+            truckAttributes.put("speed",truckModel.getSpeedPerformance());
+            truckAttributes.put("price",truckModel.getPrice());
+            truckAttributes.put("maxMileageOfTruck", truckModel.getMaxMileageOfTruck());
+            truckDto.setTruckModelAttributes(truckAttributes);
+            return new ResponseEntity<>(truckDto, HttpStatus.OK);
 
-        throw new NotEnoughMoneyException(HttpStatus.BAD_REQUEST, GameErrorMessages.USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_TRUCK);
-    }
-
-    public JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException {
-        checkToken(token);
-        FreightTerminals terminal = checkTerminalNameAndReturn(terminalName);
-        JobDto jobDto = new JobDto();
-        jobDto.setAllJobsInTerminal(jobRepository.findAllByOriginationTerminal(terminal));
-        return jobDto;
-    }
-
-    public JobDto getAllJobs(String token) throws InvalidAuthException {
-        checkToken(token);
-        JobDto jobDto = new JobDto();
-        List<Job> jobs = jobRepository.findAllByJobStatusEquals(JobStatus.VACANT).orElseThrow();
-        jobDto.setAllJobs(jobs);
-        return jobDto;
-    }
-
-    public JobDto getAllJobsForUser(String token) throws InvalidAuthException {
-        UserProfile userProfile = extractUserProfileFromToken(token);
-        JobDto jobDto = new JobDto();
-        List<Job> jobs = jobRepository.findAllByJobStatusEqualsOrJobStatusEqualsOrJobStatusEqualsAndOwnerEquals(JobStatus.IN_PROGRESS,
-                                                                                                                JobStatus.CRASH,
-                                                                                                                JobStatus.SUCCESS,
-                                                                                                                userProfile).orElseThrow();
-        jobDto.setAllJobs(jobs);
-        return jobDto;
-    }
-
-    public List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException {
-        UserProfile userProfile = extractUserProfileFromToken(token);
-        ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
-        ArrayList<TruckDto> allTheTruckDtos = new ArrayList<>();
-        for (Truck truck : trucks) {
-
+        } catch (InvalidAuthException e) {
             TruckDto truckDto = new TruckDto();
-            HashMap<String, Object> attributes = new HashMap<>();
-            attributes.put("model",truck.getTruckModel().getModel());
-            attributes.put("brand",truck.getTruckModel().getBrand());
-            attributes.put("crashRisk",truck.getTruckModel().getCrashRisk());
-            attributes.put("id",truck.getTruckModel().getTruckModelId());
-            attributes.put("fuelPerformance",truck.getTruckModel().getFuelConsumingPerformance());
-            attributes.put("speed",truck.getTruckModel().getSpeedPerformance());
-            attributes.put("price",truck.getTruckModel().getPrice());
-            attributes.put("maxMileageOfTruck", truck.getMaxMileageOfTruck());
-            truckDto.setTruckModelAttributes(attributes);
-            truckDto.setTruckId(truck.getId());
-            truckDto.setOnTheJob(truck.isUnavailable());
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (IllegalArgumentException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_NOT_FOUND.getUserText());
+            return new ResponseEntity<>(truckDto, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-            allTheTruckDtos.add(truckDto);
+    public ResponseEntity<TruckDto> buyTruck(String token, String truckName, String location) {
+        try {
+            UserProfile userProfile = extractUserProfileFromToken(token);
+            FreightTerminals terminal = checkTerminalNameAndReturn(location);
+            TruckModel truckModel = TruckModel.valueOf(truckName);
+
+            if (checkUsersMoneyAndCompareItWithPriceOfTruck(truckModel.getPrice(), userProfile)) {
+                double moneyLeft = userProfile.getTotalMoney() - truckModel.getPrice();
+                userProfile.setTotalMoney(moneyLeft);
+                userProfileRepository.save(userProfile);
+
+                Truck truck = new Truck();
+                truck.setTruckModel(truckModel);
+                truck.setOwner(userProfile);
+                truck.setUnavailable(false);
+                truck.setLocation(terminal);
+                truck.setMaxMileageOfTruck(truckModel.getMaxMileageOfTruck());
+                truckRepository.save(truck);
+
+                TruckDto truckDto = new TruckDto();
+                truckDto.setTruckModel(truckModel);
+                truckDto.setMoneyLeftInAccount(moneyLeft);
+                return new ResponseEntity<>(truckDto, HttpStatus.OK);
+            }
+            throw new NotEnoughMoneyException(HttpStatus.BAD_REQUEST, GameErrorMessages.USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_TRUCK);
+
+        } catch (InvalidAuthException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (IllegalArgumentException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(GameErrorMessages.GIVEN_TRUCK_MODEL_OR_TERMINAL_NOT_FOUND.getUserText());
+            return new ResponseEntity<>(truckDto, HttpStatus.NOT_FOUND);
+        } catch (NotEnoughMoneyException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getGameErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (Exception e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return allTheTruckDtos;
+    }
+
+    public ResponseEntity<JobDto> getAllJobsInTerminal(String token, String terminalName) {
+        try {
+            checkToken(token);
+            FreightTerminals terminal = checkTerminalNameAndReturn(terminalName);
+            JobDto jobDto = new JobDto();
+            jobDto.setAllJobsInTerminal(jobRepository.findAllByOriginationTerminal(terminal));
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+
+        } catch (IllegalArgumentException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.GIVEN_TERMINAL_COUNTRY_NAME_NOT_FOUND.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.NOT_FOUND);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<JobDto> getAllJobs(String token) {
+        try {
+            checkToken(token);
+            JobDto jobDto = new JobDto();
+            List<Job> jobs = jobRepository.findAllByJobStatusEquals(JobStatus.VACANT).orElseThrow();
+            jobDto.setAllJobs(jobs);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_VACANT_JOB.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public ResponseEntity<JobDto> getAllJobsForUser(String token) {
+        try {
+            UserProfile userProfile = extractUserProfileFromToken(token);
+            JobDto jobDto = new JobDto();
+            List<Job> jobs = jobRepository.findAllByJobStatusEqualsOrJobStatusEqualsOrJobStatusEqualsAndOwnerEquals(JobStatus.IN_PROGRESS,
+                    JobStatus.CRASH,
+                    JobStatus.SUCCESS,
+                    userProfile).orElseThrow();
+            jobDto.setAllJobs(jobs);
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.UNAUTHORIZED);
+        } catch (NoSuchElementException e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(GameErrorMessages.THERE_IS_NO_JOB_FOR_USER.getUserText());
+            return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        } catch (Exception e) {
+            JobDto jobDto = new JobDto();
+            jobDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(jobDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> getAllTrucksOfUser(String token) throws InvalidAuthException {
+        try {
+            UserProfile userProfile = extractUserProfileFromToken(token);
+            ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
+            ArrayList<TruckDto> allTheTruckDtos = new ArrayList<>();
+            for (Truck truck : trucks) {
+
+                TruckDto truckDto = new TruckDto();
+                HashMap<String, Object> attributes = new HashMap<>();
+                attributes.put("model",truck.getTruckModel().getModel());
+                attributes.put("brand",truck.getTruckModel().getBrand());
+                attributes.put("crashRisk",truck.getTruckModel().getCrashRisk());
+                attributes.put("id",truck.getTruckModel().getTruckModelId());
+                attributes.put("fuelPerformance",truck.getTruckModel().getFuelConsumingPerformance());
+                attributes.put("speed",truck.getTruckModel().getSpeedPerformance());
+                attributes.put("price",truck.getTruckModel().getPrice());
+                attributes.put("maxMileageOfTruck", truck.getMaxMileageOfTruck());
+                truckDto.setTruckModelAttributes(attributes);
+                truckDto.setTruckId(truck.getId());
+                truckDto.setOnTheJob(truck.isUnavailable());
+
+                allTheTruckDtos.add(truckDto);
+            }
+            return new ResponseEntity<>(allTheTruckDtos, HttpStatus.OK);
+
+        }  catch (InvalidAuthException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(truckDto, e.getHttpStatus());
+        } catch (NoSuchElementException e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(GameErrorMessages.USER_HAS_NO_TRUCK.getUserText());
+            return new ResponseEntity<>(truckDto, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            TruckDto truckDto = new TruckDto();
+            truckDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(truckDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException {

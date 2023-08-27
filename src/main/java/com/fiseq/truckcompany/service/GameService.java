@@ -1,29 +1,27 @@
 package com.fiseq.truckcompany.service;
 
-import com.fiseq.truckcompany.constants.TruckModel;
 import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.exception.*;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 public interface GameService {
-    List<TruckModel> getAllTruckModels(String token) throws InvalidAuthException;
+    ResponseEntity<TruckDto> getAllTruckModels(String token) throws InvalidAuthException;
 
-    TruckModel getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException;
+    ResponseEntity<TruckDto> getTruckAttributes(String token, String truckModel) throws InvalidAuthException, IllegalArgumentException;
 
-    TruckDto buyTruck(String token, String truckName, String location) throws Exception;
+    ResponseEntity<TruckDto> buyTruck(String token, String truckName, String location);
 
-    JobDto getAllJobsInTerminal(String token, String terminalName) throws InvalidAuthException;
+    ResponseEntity<JobDto> getAllJobsInTerminal(String token, String terminalName);
 
     JobDto takeJob(String token, TakeJobDto takeJobDto, Long jobId) throws InvalidAuthException, DifferentRegionDistanceCalculationException, InvalidRouteForJobException;
 
     JobDto finishJob(String token, Long jobId) throws InvalidAuthException, JobIsNotFinishedException, TruckCrashedException;
 
-    JobDto getAllJobs(String token) throws InvalidAuthException;
+    ResponseEntity<JobDto> getAllJobs(String token);
 
-    JobDto getAllJobsForUser(String token) throws InvalidAuthException;
+    ResponseEntity<JobDto> getAllJobsForUser(String token);
 
-    List<TruckDto> getAllTrucksOfUser(String token) throws InvalidAuthException;
+    ResponseEntity<?> getAllTrucksOfUser(String token) throws InvalidAuthException;
 
     ItemSellDto sellItem(String authorizationHeader, ItemSellRequestDto itemSellRequestDto);
 
