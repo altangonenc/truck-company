@@ -4,6 +4,7 @@ import com.fiseq.truckcompany.constants.GameConstants;
 import com.fiseq.truckcompany.constants.RecoveryQuestion;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
+import com.fiseq.truckcompany.dto.LeaderboardDto;
 import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -258,5 +261,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private void changeWithNewPassword (UserDto user) {
         userRepository.save(UserMapper.userDtoToUser(user));
         System.out.println("password successfully changed");
+    }
+
+    public List<LeaderboardDto> getLeaderboardForMoney(String authorizationHeader) {
+        extractTokenAndGetUsername(authorizationHeader);
+        List<UserProfile> profiles = userProfileRepository.findAllByOrderByTotalMoneyDesc();
+
+        return profiles.stream()
+                .map(profile -> new LeaderboardDto(profile.getUser().getUserName(), profile.getTotalMoney()))
+                .collect(Collectors.toList());
     }
 }

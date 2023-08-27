@@ -2,10 +2,7 @@ package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
-import com.fiseq.truckcompany.dto.LoginForm;
-import com.fiseq.truckcompany.dto.UserDto;
-import com.fiseq.truckcompany.dto.UserInformationDto;
-import com.fiseq.truckcompany.dto.UserRegistrationData;
+import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
 import com.fiseq.truckcompany.exception.InvalidAuthException;
 import com.fiseq.truckcompany.service.UserService;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -102,6 +100,22 @@ public class UserController {
         } catch (Exception e) {
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setErrorMessage("Something went wrong while changing password.");
+            return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<?> getLeaderboardForTotalMoney(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            ArrayList<LeaderboardDto> leaderboard = (ArrayList<LeaderboardDto>) userService.getLeaderboardForMoney(authorizationHeader);
+            return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+        } catch (InvalidAuthException e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(userInformationDto, e.getHttpStatus());
+        } catch (Exception e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
