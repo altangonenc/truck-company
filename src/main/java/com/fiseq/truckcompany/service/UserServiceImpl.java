@@ -4,10 +4,7 @@ import com.fiseq.truckcompany.constants.GameConstants;
 import com.fiseq.truckcompany.constants.RecoveryQuestion;
 import com.fiseq.truckcompany.constants.SecurityConstants;
 import com.fiseq.truckcompany.constants.UserRegistrationErrorMessages;
-import com.fiseq.truckcompany.dto.LeaderboardDto;
-import com.fiseq.truckcompany.dto.UserDto;
-import com.fiseq.truckcompany.dto.UserInformationDto;
-import com.fiseq.truckcompany.dto.UserRegistrationData;
+import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.entities.User;
 import com.fiseq.truckcompany.entities.UserProfile;
 import com.fiseq.truckcompany.exception.ChangePasswordException;
@@ -17,10 +14,16 @@ import com.fiseq.truckcompany.repository.UserRepository;
 import com.fiseq.truckcompany.utilities.UserMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,12 +41,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder, @Lazy AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -125,13 +130,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader) throws InvalidAuthException {
-        String username = extractTokenAndGetUsername(authorizationHeader);
+        try {
+            String username = extractTokenAndGetUsername(authorizationHeader);
 
-        UserInformationDto userInformationDto = getUserByUsername(username);
-        if (userInformationDto == null) {
-            throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.USER_NOT_EXISTS);
+            UserInformationDto userInformationDto = getUserByUsername(username);
+            if (userInformationDto == null) {
+                throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.USER_NOT_EXISTS);
+            }
+            return ResponseEntity.ok(userInformationDto);
+
+        } catch (InvalidAuthException e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(userInformationDto, e.getHttpStatus());
+        } catch (Exception e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok(userInformationDto);
     }
 
     public String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
@@ -226,15 +242,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    public ResponseEntity<UserInformationDto> changePassword(UserDto userDto) throws ChangePasswordException {
-        checkIfInformationsOfUserNotCorrect(userDto);
-        changeWithNewPassword(userDto);
+    public ResponseEntity<UserInformationDto> changePassword(UserDto userDto){
+        try {
+            checkIfInformationsOfUserNotCorrect(userDto);
+            changeWithNewPassword(userDto);
 
-        UserInformationDto userInformationDto = new UserInformationDto();
-        userInformationDto.setSuccessMessage("Password successfully changed");
-        userInformationDto.setUserName(userDto.getUserName());
-        userInformationDto.setEmail(userDto.getEmail());
-        return new ResponseEntity<>(userInformationDto, HttpStatus.OK);
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setSuccessMessage("Password successfully changed");
+            userInformationDto.setUserName(userDto.getUserName());
+            userInformationDto.setEmail(userDto.getEmail());
+            return new ResponseEntity<>(userInformationDto, HttpStatus.OK);
+
+        } catch (ChangePasswordException e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(userInformationDto, e.getHttpStatus());
+        } catch (Exception e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage("Something went wrong while changing password.");
+            return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     private void checkIfInformationsOfUserNotCorrect(UserDto user) throws ChangePasswordException {
@@ -263,12 +291,46 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         System.out.println("password successfully changed");
     }
 
-    public List<LeaderboardDto> getLeaderboardForMoney(String authorizationHeader) {
-        extractTokenAndGetUsername(authorizationHeader);
-        List<UserProfile> profiles = userProfileRepository.findAllByOrderByTotalMoneyDesc();
+    public ResponseEntity<?> getLeaderboardForMoney(String authorizationHeader) {
+        try {
+            extractTokenAndGetUsername(authorizationHeader);
+            List<UserProfile> profiles = userProfileRepository.findAllByOrderByTotalMoneyDesc();
 
-        return profiles.stream()
-                .map(profile -> new LeaderboardDto(profile.getUser().getUserName(), profile.getTotalMoney()))
-                .collect(Collectors.toList());
+            ArrayList<LeaderboardDto> leaderboard = (ArrayList<LeaderboardDto>) profiles.stream()
+                    .map(profile -> new LeaderboardDto(profile.getUser().getUserName(), profile.getTotalMoney()))
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+
+        } catch (InvalidAuthException e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getUserRegistrationErrorMessages().getUserText());
+            return new ResponseEntity<>(userInformationDto, e.getHttpStatus());
+        } catch (Exception e) {
+            UserInformationDto userInformationDto = new UserInformationDto();
+            userInformationDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(userInformationDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public ResponseEntity<String> loginUser(LoginForm loginForm) {
+        final String username = loginForm.getUsername();
+        final String password = loginForm.getPassword();
+        if (!isPasswordMatched(password, username)) {
+            return new ResponseEntity<>(UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS.getUserText(), HttpStatus.BAD_REQUEST);
+
+        }
+        // verify username and password of user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password)
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // create JWT and return it
+        String token = Jwts.builder()
+                .setSubject(username)
+                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes())
+                .compact();
+        return ResponseEntity.ok(token);
     }
 }

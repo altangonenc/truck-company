@@ -5,6 +5,7 @@ import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class GameController {
     private final GameService gameService;
 
+    @Autowired
     public GameController(GameService gameService) {
         this.gameService = gameService;
     }

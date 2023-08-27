@@ -7,6 +7,8 @@ import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.repository.*;
 import com.fiseq.truckcompany.utilities.DifferentRegionDistanceCalculator;
 import com.fiseq.truckcompany.utilities.SameRegionDistanceCalculator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,14 +19,15 @@ import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService{
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final TruckRepository truckRepository;
     private final JobRepository jobRepository;
     private final ItemRepository itemRepository;
 
-    public GameServiceImpl(UserServiceImpl userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository, JobRepository jobRepository, ItemRepository itemRepository) {
+    @Autowired
+    public GameServiceImpl(UserService userService, UserRepository userRepository, UserProfileRepository userProfileRepository, TruckRepository truckRepository, JobRepository jobRepository, ItemRepository itemRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
