@@ -17,9 +17,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -129,6 +132,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return passwordEncoder.encode(password);
     }
 
+    @Cacheable(value = "userProfiles", key = "#authorizationHeader")
     public ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader) throws InvalidAuthException {
         try {
             String username = extractTokenAndGetUsername(authorizationHeader);
@@ -150,6 +154,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
+    @CacheEvict(cacheNames = "userProfiles", allEntries = true, beforeInvocation = true)
+    @Scheduled(fixedDelay = 1 * 7 * 24 * 60 * 60 * 1000) // once a week
+    public void evictExpiredUserProfiles() {
+    }
+
     public String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
         if (!isAuthValid(authorizationHeader)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);
@@ -163,7 +172,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return false;
         }
-        String token = authorizationHeader.substring(7); // "Bearer " prefixini kaldırıyoruz
+        String token = authorizationHeader.substring(7); // remove "Bearer"
         // verify token:
         if (!validateToken(token)) {
             return false;
