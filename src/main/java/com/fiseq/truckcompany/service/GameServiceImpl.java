@@ -7,8 +7,8 @@ import com.fiseq.truckcompany.exception.*;
 import com.fiseq.truckcompany.repository.*;
 import com.fiseq.truckcompany.utilities.DifferentRegionDistanceCalculator;
 import com.fiseq.truckcompany.utilities.SameRegionDistanceCalculator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class GameServiceImpl implements GameService{
     private final UserService userService;
     private final UserRepository userRepository;
