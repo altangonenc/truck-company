@@ -8,7 +8,6 @@ import com.fiseq.truckcompany.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +18,9 @@ import java.util.ArrayList;
 @RequestMapping("api/v1/users")
 @Api(tags = "User Controller", description = "User Specific Operations")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<UserRegistrationData> registerUser(@RequestBody UserDto userDto) {

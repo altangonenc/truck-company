@@ -5,8 +5,8 @@ import com.fiseq.truckcompany.dto.*;
 import com.fiseq.truckcompany.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/game")
 @Api(tags = "Game Controller", description = "In Game Operations")
 @Slf4j
+@RequiredArgsConstructor
 public class GameController {
     private final GameService gameService;
-
-    @Autowired
-    public GameController(GameService gameService) {
-        this.gameService = gameService;
-    }
 
     @GetMapping("/trucks")
     @JsonView(Views.TruckModelView.class)
