@@ -21,7 +21,7 @@ public class SpringFoxConfig {
                 .groupName("User API")
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.fiseq.truckcompany.controller")) // UserController
-                .paths(PathSelectors.ant("/users/**"))
+                .paths(PathSelectors.ant("/api/v1/users/**"))
                 .build();
     }
 

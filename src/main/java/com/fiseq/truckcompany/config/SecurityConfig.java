@@ -30,10 +30,10 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .antMatchers("/users/register").permitAll()
-                                .antMatchers("/users/recovery-question").permitAll()
-                                .antMatchers("/users/change-password").permitAll()
-                                .antMatchers("/users/login").permitAll()
+                                .antMatchers("/api/v1/users/register").permitAll()
+                                .antMatchers("/api/v1/users/recovery-question").permitAll()
+                                .antMatchers("/api/v1/users/change-password").permitAll()
+                                .antMatchers("/api/v1/users/login").permitAll()
                                 .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/swagger-ui", "/v3/api-docs/**",
                                         "/v2/api-docs", "/webjars/**", "/swagger-resources/**").permitAll()
                                 .anyRequest().authenticated()
