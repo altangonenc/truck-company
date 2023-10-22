@@ -71,13 +71,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.FIELDS_CANNOT_BE_EMPTY.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.BAD_REQUEST);
         }
-        if (isUsernameAlreadExists(userDto.getUserName())) {
+        if (isUsernameAlreadyExist(userDto.getUserName())) {
             userRegistrationData.setUserName(userDto.getUserName());
             userRegistrationData.setEmail(userDto.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.USERNAME_ALREADY_EXIST.getUserText());
             return new ResponseEntity<>(userRegistrationData, HttpStatus.CONFLICT);
         }
-        if (isEmailAlreadyExists(userDto.getEmail())) {
+        if (isEmailAlreadyExist(userDto.getEmail())) {
             userRegistrationData.setUserName(userDto.getUserName());
             userRegistrationData.setEmail(userDto.getEmail());
             userRegistrationData.setErrorMessage(UserRegistrationErrorMessages.EMAIL_ALREADY_EXISTS.getUserText());
@@ -122,11 +122,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return false;
     }
 
-    private boolean isUsernameAlreadExists(String username) {
+    private boolean isUsernameAlreadyExist(String username) {
         return userRepository.existsByUserName(username);
     }
 
-    private boolean isEmailAlreadyExists(String email) {
+    private boolean isEmailAlreadyExist(String email) {
         return userRepository.existsByEmail(email);
     }
 
