@@ -1,17 +1,13 @@
 package com.fiseq.truckcompany.controller;
 
 import com.fiseq.truckcompany.TruckCompanyApplication;
-import com.fiseq.truckcompany.constants.FreightTerminals;
-import com.fiseq.truckcompany.constants.JobStatus;
-import com.fiseq.truckcompany.dto.*;
-import com.fiseq.truckcompany.entities.Job;
-import com.fiseq.truckcompany.entities.User;
+import com.fiseq.truckcompany.dto.LoginForm;
+import com.fiseq.truckcompany.dto.TruckDto;
+import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.repository.JobRepository;
 import com.fiseq.truckcompany.repository.TruckRepository;
 import com.fiseq.truckcompany.repository.UserProfileRepository;
 import com.fiseq.truckcompany.repository.UserRepository;
-import com.fiseq.truckcompany.service.UserService;
-import com.fiseq.truckcompany.service.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -50,10 +46,10 @@ public class GameControllerIT {
     @Before
     public void setUp() {
         // delete test database before each test
-        userRepository.deleteAll();
-        userProfileRepository.deleteAll();
-        truckRepository.deleteAll();
         jobRepository.deleteAll();
+        truckRepository.deleteAll();
+        userProfileRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     public String getToken() {
