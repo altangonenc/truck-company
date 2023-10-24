@@ -476,6 +476,7 @@ public class GameServiceImpl implements GameService{
             validatePriceOfItem(itemSellRequestDto.getPrice());
 
             Truck truck = getTruckWhichIsNotUnavailable(userProfile, itemSellRequestDto);
+            checkIfUserHasOnlyOneTruck(userProfile);
             truck.setUnavailable(true);
 
             Item item = new Item();
@@ -509,6 +510,13 @@ public class GameServiceImpl implements GameService{
             return new ResponseEntity<>(itemSellDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    private void checkIfUserHasOnlyOneTruck(UserProfile userProfile) throws CannotSellTruckException {
+        ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
+        if (trucks.size() < 2) {
+            throw new CannotSellTruckException(GameErrorMessages.CANNOT_SELL_TRUCK);
+        }
     }
 
     private Truck getTruckWhichIsNotUnavailable(UserProfile userProfile, ItemSellRequestDto itemSellRequestDto) {

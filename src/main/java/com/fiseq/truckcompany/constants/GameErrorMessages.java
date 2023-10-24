@@ -5,6 +5,7 @@ public enum GameErrorMessages {
     GIVEN_TRUCK_MODEL_OR_TERMINAL_NOT_FOUND("Given truck model or terminal is not valid."),
     GIVEN_TRUCK_MODEL_NOT_FOUND("Given truck model is not valid."),
     CANNOT_BUY_TRUCK("Truck is already yours or not available for sale."),
+    CANNOT_SELL_TRUCK("User has only 1 truck and user cannot sell this truck."),
     USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_TRUCK("User does not have enough money to buy this truck."),
     USERS_MONEY_IS_NOT_ENOUGH_TO_BUY_THIS_ITEM("User does not have enough money to buy this item."),
     GIVEN_TERMINAL_COUNTRY_NAME_NOT_FOUND("Given terminal name is not valid."),
