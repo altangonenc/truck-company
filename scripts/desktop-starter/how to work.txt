@@ -1,0 +1,17 @@
+How to create GUI for starting truck-company application. 
+
+1) First you need to install "pyinstaller": 
+pip install pyinstaller
+
+2) specify your .jar file path in desktop-start.py script
+
+3) This command creates .exe file from script:
+pyinstaller --onefile desktop-start.py
+
+4) specify desktop-start.exe file's path in gui.py 
+
+5) pyinstaller --onefile gui.py
+
+
+
+
