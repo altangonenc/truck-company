@@ -1,0 +1,40 @@
+version: '3.3'
+
+#Open Docker Desktop.
+#
+#go to SETTINGS.
+#
+#click "Resources".
+#
+#go to "File Sharing" and add C:\Users\altan\Desktop\truck-company-all\truck-company\data directory.
+networks:
+  my_network:
+    driver: bridge
+
+services:
+  mariadb:
+    image: mariadb:10.11.3
+    container_name: truck-company-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: truckcompany
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12345
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+    volumes:
+      - ./data:/var/lib/mysql
+    restart: unless-stopped
+
+  java_app:
+    image: truck-company-service:1.0.0  # Java Docker Image
+    container_name: truck-company-service
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+    depends_on:
+      - mariadb
+    restart: unless-stopped
