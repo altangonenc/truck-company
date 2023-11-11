@@ -14,8 +14,10 @@ In order to be understandable, APIs are presented under 2 headings.
 1) User Management Api's 
 2) Gameplay Api's
 
+## USEFUL SCRIPTS AND .EXE FILES 
 * _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
-
+* _If you want to run the application in a simple way and you have docker installed on your local, you can run the "automate.exe" file to stand up the application and database. To stop 2 containers, just run "docker-compose down". Also this process gets the latest build of application._
+* _"gui.exe" has 2 options. You can start the application or update jar file._
 
 ## USER MANAGEMENT API'S
 
