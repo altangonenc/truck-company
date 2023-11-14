@@ -398,7 +398,7 @@ public class GameServiceImpl implements GameService{
         return distance;
     }
 
-    private double calculateDistance(TakeJobDto takeJobDto, Job job, Truck truck) throws DifferentRegionDistanceCalculationException, InvalidRouteForJobException {
+    private double calculateDistance(TakeJobDto takeJobDto, Job job, Truck truck) {
         double distance = calculateTrucksLocationToStartTerminal(job, truck);
 
         if (takeJobDto.getRoute() == null) {
@@ -434,7 +434,7 @@ public class GameServiceImpl implements GameService{
         return distance;
     }
 
-    private FreightTerminals checkTerminalNameAndReturn(String terminalName) throws IllegalArgumentException{
+    private FreightTerminals checkTerminalNameAndReturn(String terminalName) {
         return FreightTerminals.valueOf(terminalName.toUpperCase());
     }
 
@@ -446,17 +446,17 @@ public class GameServiceImpl implements GameService{
         return false;
     }
 
-    private void checkToken(String token) throws InvalidAuthException {
+    private void checkToken(String token) {
         if (!isTokenValid(token)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);
         }
     }
 
-    private String checkTokenAndReturnUsername(String token) throws InvalidAuthException {
+    private String checkTokenAndReturnUsername(String token) {
         return userService.extractTokenAndGetUsername(token);
     }
 
-    private boolean isTokenValid(String token) throws InvalidAuthException {
+    private boolean isTokenValid(String token) {
         String username = userService.extractTokenAndGetUsername(token);
         if (userRepository.existsByUserName(username)) {
             return true;
@@ -512,7 +512,7 @@ public class GameServiceImpl implements GameService{
 
     }
 
-    private void checkIfUserHasOnlyOneTruck(UserProfile userProfile) throws CannotSellTruckException {
+    private void checkIfUserHasOnlyOneTruck(UserProfile userProfile) {
         ArrayList<Truck> trucks = truckRepository.findAllByOwner(userProfile).orElseThrow();
         if (trucks.size() < 2) {
             throw new CannotSellTruckException(GameErrorMessages.CANNOT_SELL_TRUCK);

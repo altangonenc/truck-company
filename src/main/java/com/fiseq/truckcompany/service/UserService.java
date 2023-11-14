@@ -4,7 +4,6 @@ import com.fiseq.truckcompany.dto.LoginForm;
 import com.fiseq.truckcompany.dto.UserDto;
 import com.fiseq.truckcompany.dto.UserInformationDto;
 import com.fiseq.truckcompany.dto.UserRegistrationData;
-import com.fiseq.truckcompany.exception.InvalidAuthException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public interface UserService {
 
     ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader);
 
-    String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException;
+    String extractTokenAndGetUsername(String authorizationHeader);
 
     ArrayList<String> getRecoveryQuestion(String authorizationHeader);
 

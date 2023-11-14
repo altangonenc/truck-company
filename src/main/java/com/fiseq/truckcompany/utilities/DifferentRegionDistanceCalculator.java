@@ -11,7 +11,7 @@ public class DifferentRegionDistanceCalculator extends DistanceCalculator {
     }
 
     @Override
-    public double calculateRoute() throws DifferentRegionDistanceCalculationException {
+    public double calculateRoute() {
 
         if (((getFrom().getRegion() == CountryRegion.SOUTH_AMERICA || getFrom().getRegion() == CountryRegion.NORTH_AMERICA)
                 && (getTo().getRegion() != CountryRegion.SOUTH_AMERICA || getTo().getRegion() != CountryRegion.NORTH_AMERICA))

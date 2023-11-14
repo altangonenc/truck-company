@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Cacheable(value = "userProfiles", key = "#authorizationHeader")
-    public ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader) throws InvalidAuthException {
+    public ResponseEntity<UserInformationDto> getUserProfile(String authorizationHeader) {
         try {
             String username = extractTokenAndGetUsername(authorizationHeader);
 
@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void evictExpiredUserProfiles() {
     }
 
-    public String extractTokenAndGetUsername(String authorizationHeader) throws InvalidAuthException {
+    public String extractTokenAndGetUsername(String authorizationHeader) {
         if (!isAuthValid(authorizationHeader)) {
             throw new InvalidAuthException(HttpStatus.UNAUTHORIZED, UserRegistrationErrorMessages.INVALID_AUTH_PARAMETERS);
         }
@@ -276,7 +276,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
-    private void checkIfInformationsOfUserNotCorrect(UserDto user) throws ChangePasswordException {
+    private void checkIfInformationsOfUserNotCorrect(UserDto user) {
         User createdUser = userRepository.findByUserName(user.getUserName());
         if (createdUser == null) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
