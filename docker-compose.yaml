@@ -28,6 +28,15 @@ services:
       - ./data:/var/lib/mysql
     restart: unless-stopped
 
+  redis:
+    image: redis:7.2.3
+    container_name: truck-company-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - my_network
+    restart: unless-stopped
+
   java_app:
     image: truck-company-service:1.0.0  # Java Docker Image
     container_name: truck-company-service
@@ -37,4 +46,5 @@ services:
       - my_network
     depends_on:
       - mariadb
+      - redis
     restart: unless-stopped
