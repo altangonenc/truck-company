@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class PaymentFacade {
+public class PaymentUtil {
 
     @Value("${iyzico.api.key}")
     private static String API_KEY;
