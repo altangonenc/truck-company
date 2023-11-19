@@ -6,19 +6,26 @@ The backend of an online game called Truck-company.
 * _Spring Boot_
 * _Spring Data JPA_
 * _Spring Security_
+* _Spring Boot Starter Data Redis_ 
+* _Swagger_ 
 * _MariaDB_
+* _Redis_
+* _Jwt_
+* _JUnit, Mockito_
+* _Lombok_ 
 * _Iyzipay (for ingame sales)_)(not for sure)(stripe is still an option)
+* _Docker_
 
-
-In order to be understandable, APIs are presented under 2 headings.
-1) User Management Api's 
-2) Gameplay Api's
-
-## USEFUL SCRIPTS AND .EXE FILES 
+### USEFUL SCRIPTS AND .EXE FILES 
 * _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
 * _If you want to run the application in a simple way and you have docker installed on your local, you can run the "automate.exe" file to stand up the application and database. To stop 2 containers, just run "docker-compose down". Also this process gets the latest build of application._
 * _"gui.exe" has 2 options. You can start the application or update jar file._
 
+
+##In order to be understandable, APIs are presented under 2 headings.
+1) User Management Api's
+2) Gameplay Api's
+ 
 ## USER MANAGEMENT API'S
 
 ### SIGN UP API (POST):
