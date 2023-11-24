@@ -1,0 +1,11 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /usr/src/app/src/main/resources/*.log  # Log files
+
+output.logstash:
+  hosts: ["http://172.18.0.5:5044"]  # Logstash ip and port
+
+setup.template.name: "java-logs-"
+setup.template.pattern: "java-logs-*"
