@@ -69,6 +69,8 @@ services:
     image: docker.elastic.co/logstash/logstash:8.11.1
     networks:
       - my_network
+    ports:
+      - "5044:5044"
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipeline:/usr/share/logstash/pipeline
