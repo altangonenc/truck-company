@@ -6,6 +6,6 @@ xpack:
     elasticsearch:
       username: 'admin'
       password: 'adminadmin'
-      hosts: ["http://172.18.0.3:9200"]
+      hosts: ["http://elasticsearch:9200"]
       ssl:
         verification_mode: none
