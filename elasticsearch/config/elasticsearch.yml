@@ -1,0 +1,23 @@
+cluster.name: "elasticsearch"
+node.name: "truck-company-node"
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+network.host: 0.0.0.0
+http.port: 9200
+
+discovery.type: single-node
+
+# Elasticsearch heap memory
+#memory:
+#  java:
+#    heap:
+#      Xms: 2g
+#      Xmx: 2g
+# Xms: 2g
+# Xmx: 2g
+xpack.security.enabled: false
+#security:
+#  user:
+#    admin: adminadmin
+
