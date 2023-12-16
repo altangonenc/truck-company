@@ -15,6 +15,8 @@ The backend of an online game called Truck-company.
 * _Lombok_ 
 * _Iyzipay (for ingame sales)_)(not for sure)(stripe is still an option)
 * _Docker_
+* _Elasticsearch, Kibana, Logstash support ('monitoring' branch)_
+* _Kubernetes support ('kubernetes' branch)_
 
 ### USEFUL SCRIPTS AND .EXE FILES 
 * _Freight terminals can be observed by running the script "scripts/countryGraphScript/countryGraph.py" with the "py" command._
