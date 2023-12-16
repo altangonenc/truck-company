@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -255,8 +256,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public ResponseEntity<UserInformationDto> changePassword(UserDto userDto){
         try {
-            checkIfInformationsOfUserNotCorrect(userDto);
-            changeWithNewPassword(userDto);
+            changeWithNewPassword(checkIfInformationsOfUserNotCorrectElseReturnUser(userDto), userDto);
 
             UserInformationDto userInformationDto = new UserInformationDto();
             userInformationDto.setSuccessMessage("Password successfully changed");
@@ -276,7 +276,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
-    private void checkIfInformationsOfUserNotCorrect(UserDto user) {
+    private User checkIfInformationsOfUserNotCorrectElseReturnUser(UserDto user) {
         User createdUser = userRepository.findByUserName(user.getUserName());
         if (createdUser == null) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
@@ -284,7 +284,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (createdUser.getRecoveryQuestionId() != user.getRecoveryQuestionId()) {
             throw new ChangePasswordException(HttpStatus.BAD_REQUEST, UserRegistrationErrorMessages.INVALID_RECOVERY_QUESTION_FOR_SPECIFIED_USER);
         }
-        if (!passwordEncoder.matches(user.getRecoveryAnswer(),createdUser.getRecoveryAnswer())){
+        if (!passwordEncoder.matches(user.getRecoveryAnswer(), createdUser.getRecoveryAnswer())) {
             throw new ChangePasswordException(HttpStatus.BAD_REQUEST, UserRegistrationErrorMessages.INVALID_RECOVERY_ANSWER);
         }
         if (!createdUser.getUserName().equals(user.getUserName())) {
@@ -293,12 +293,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (!createdUser.getEmail().equals(user.getEmail())) {
             throw new ChangePasswordException(HttpStatus.NOT_FOUND, UserRegistrationErrorMessages.USER_NOT_EXISTS);
         }
+        return createdUser;
     }
-    public boolean isPasswordMatched (String password, String username) {
-        return passwordEncoder.matches(password,userRepository.findByUserName(username).getPassword());
+
+    public boolean isPasswordMatched(String password, String username) {
+        return passwordEncoder.matches(password, userRepository.findByUserName(username).getPassword());
     }
-    private void changeWithNewPassword (UserDto user) {
-        userRepository.save(UserMapper.userDtoToUser(user));
+
+    private void changeWithNewPassword(User user, UserDto userDto) {
+        User user1 = UserMapper.userDtoToUser(userDto);
+        user.setPassword(user1.getPassword());
+        userRepository.save(user);
         System.out.println("password successfully changed");
     }
 
