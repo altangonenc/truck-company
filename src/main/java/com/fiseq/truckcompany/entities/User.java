@@ -6,7 +6,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_username", columnList = "username")
+})
 @Getter
 @Setter
 @NoArgsConstructor
