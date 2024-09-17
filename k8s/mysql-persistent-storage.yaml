@@ -1,0 +1,12 @@
+# kubectl apply -f k8s/mysql-persistent-storage.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-persistent-storage
+  namespace: truck-company
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
