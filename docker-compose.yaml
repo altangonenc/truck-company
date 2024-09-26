@@ -10,6 +10,8 @@ version: '3.3'
 networks:
   my_network:
     driver: bridge
+    ipam:
+      driver: default
 
 services:
   mariadb:
@@ -37,6 +39,32 @@ services:
       - my_network
     restart: unless-stopped
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - my_network
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+#      - ./elasticsearch/certs:/usr/share/elasticsearch/config/certs
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - my_network
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config/
+#      - ./kibana/certs:/usr/share/kibana/config/certs
+    depends_on:
+      - elasticsearch
+
   java_app:
     image: truck-company-service:1.0.0  # Java Docker Image
     container_name: truck-company-service
@@ -44,6 +72,8 @@ services:
       - "8080:8080"
     networks:
       - my_network
+    volumes:
+      - ./src/main/resources/logback.xml:/usr/src/app/src/main/resources/logback.xml
     depends_on:
       - mariadb
       - redis
